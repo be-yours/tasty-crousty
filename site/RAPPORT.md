@@ -4,6 +4,9 @@ Démonstration de prospection pour le Salon de la Street Food (Villepinte, 7-8 n
 
 **Historique :** la première version (« Barquette Pop », fond clair pastel, illustrations SVG plates) a été refusée par l'utilisateur le 2026-11-03, écrite sans avoir regardé une seule photo de la marque. Elle est archivée dans `site/source/archive/barquette-pop/` et jamais remise en service. La refonte repart de la marque réelle : voir `site/BRAND_RESEARCH.md`.
 
+## Démo en ligne
+Mise en ligne privée le 3 novembre 2026 (Vercel, Convex `dev` cloud, dépôt GitHub public dédié) : adresses, accès, redéploiement et variables dans `site/DEPLOYMENT.md`. Le lien de partage n'est écrit dans aucun fichier.
+
 ## Lancer le site en local
 Pré-requis : le moteur lié au commit `9ce1d4d0` (worktree `/Users/admin/Desktop/Dev/agence/beyours-luks`, partagé avec Lüks), puis :
 

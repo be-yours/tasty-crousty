@@ -490,8 +490,8 @@
 
 .storefront-theme .storefront-menu-name .line-clamp-1 {
   /* the condensed capitals overhang their box: keep the first letter whole */
-  padding-inline: 0.08em 0.04em;
-  margin-inline-start: -0.08em;
+  padding-inline: 0.2em 0.1em;
+  margin-inline-start: -0.2em;
   text-wrap: wrap !important;
 }
 
@@ -1068,12 +1068,20 @@
 
 /* /track: the order number in a pink tube, steps as a list of pills */
 .storefront-theme main:has(ol.space-y-3) h1.italic.text-4xl {
-  font-size: clamp(3rem, 10vw, 5.5rem) !important;
+  font-size: clamp(2.6rem, 9vw, 4.5rem) !important;
   line-height: 0.88 !important;
 }
 
 .storefront-theme main:has(ol.space-y-3) h1.italic.text-4xl > span {
   font-style: italic !important;
+  /* the order number stays on one line instead of breaking at its hyphens */
+  white-space: nowrap;
+}
+
+/* steps not reached yet: the engine paints them white at 60 %, which turns pale
+   grey on the night ground. A dim slab keeps the grey text readable (10:1). */
+.storefront-theme main ol.space-y-3 > li.bg-white\/60 {
+  background: color-mix(in srgb, var(--tc-slab) 72%, transparent);
 }
 
 .storefront-theme main ol.space-y-3 > li {
