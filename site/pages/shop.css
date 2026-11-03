@@ -1,0 +1,1195 @@
+/*
+ * SHOP · Tasty Crousty « Vice City Crousty » · CLIENT ZONE
+ * /menu (« Le comptoir LED »), the product dialog, /cart, /checkout, /order,
+ * /track and the closed banner. Contract: site/ART_DIRECTION.md §8 and §12.
+ * Readability and prices first: every price is the loudest thing of its card,
+ * in poster capitals, in the brand word colour (night #F784B8 8.03:1 on the
+ * ground; light #8A0B4C on white 10.3:1).
+ *
+ * Engine markup read (hard-coded strings of the engine can only be restyled):
+ *   /menu      main > div.pt-20 > section.bg-primary (badge, h1 > span, p, search pill)
+ *              > section.uppercase > div (category pills) + div (« Affichage » row) + grid .storefront-menu
+ *              > section > div.bg-primary (« Besoin d'aide »)
+ *   card       .storefront-menu-item > .storefront-menu-photo (img, badges, .storefront-menu-fav)
+ *              + .storefront-menu-body (.storefront-menu-name, -desc, -foot > -price + .storefront-menu-add)
+ *   dialog     .storefront-theme[data-slot=dialog-content] > ProductDetailClient
+ *   /cart      main > div.min-h-screen > div.bg-primary.pt-28|pt-32 (icon, h1) + div.container
+ *   /checkout  main > div.bg-muted.pt-32 > div > header + grid
+ *   /order     main > div.pt-20 > section.bg-primary (CheckCircle, h1)
+ *
+ * Shop headers (menu, cart, order) are night islands in both modes, closed at
+ * the foot by the LED counter band that sweeps once.
+ *
+ * DEV NOTE: after editing this file, `printf '\n' >> site/theme.css`, wait ~4 s.
+ */
+
+/* ═══════════════════════════ 0. Page shells ═══════════════════════════ */
+
+/* overflow-x: hidden makes a scroll container (view() timelines freeze, sticky dies) */
+.storefront-theme main > div:is(:has(input[aria-label="Rechercher un plat"]), :has(> section.bg-primary svg:is(.lucide-circle-check-big, .lucide-circle-check, .lucide-check-circle))) {
+  overflow-x: clip !important;
+  overflow-y: visible !important;
+  padding-top: 0 !important;
+  background: transparent !important;
+}
+
+/* ═══════════════════════════ 1. Shop headers: the night counter ═══════════════════════════ */
+
+.storefront-theme main :is(
+  section.bg-primary:has(input[aria-label="Rechercher un plat"]),
+  div.bg-primary:is(.pt-28, .pt-32):has(svg.lucide-shopping-bag),
+  section.bg-primary:has(svg:is(.lucide-circle-check-big, .lucide-circle-check, .lucide-check-circle))
+) {
+  --tc-text: #fff5fa;
+  --tc-text-2: #c9bcc5;
+  --tc-glow: 1;
+  --primary: 333 86.2% 71.6%;
+  --primary-foreground: 24 9.8% 10%;
+  position: relative;
+  isolation: isolate;
+  overflow: clip !important;
+  border-radius: 0 !important;
+  padding: calc(var(--tc-bar-h) + var(--tc-bar-top) + 2.5rem) 1.25rem calc(46px + 3rem) !important;
+  background:
+    radial-gradient(70% 70% at 50% -10%, rgb(170 148 255 / 0.24), transparent 70%),
+    radial-gradient(45% 60% at 100% 20%, rgb(245 120 176 / 0.2), transparent 70%),
+    radial-gradient(45% 60% at 0% 40%, rgb(93 209 227 / 0.14), transparent 70%),
+    linear-gradient(180deg, #0b080c 0%, #1b0f24 100%) !important;
+  color: var(--tc-white);
+  text-align: center;
+}
+
+.storefront-theme:has(> div.fixed.top-0.h-10) main :is(
+  section.bg-primary:has(input[aria-label="Rechercher un plat"]),
+  div.bg-primary:is(.pt-28, .pt-32):has(svg.lucide-shopping-bag),
+  section.bg-primary:has(svg:is(.lucide-circle-check-big, .lucide-circle-check, .lucide-check-circle))
+) {
+  padding-top: calc(var(--tc-bar-h) + var(--tc-bar-top) + 40px + 2.5rem) !important;
+}
+
+/* the LED counter band along the foot */
+.storefront-theme main :is(
+  section.bg-primary:has(input[aria-label="Rechercher un plat"]),
+  div.bg-primary:is(.pt-28, .pt-32):has(svg.lucide-shopping-bag),
+  section.bg-primary:has(svg:is(.lucide-circle-check-big, .lucide-circle-check, .lucide-check-circle))
+)::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 46px;
+  z-index: -1;
+  background-color: var(--tc-night);
+  background-image:
+    var(--tc-led),
+    linear-gradient(100deg, #ff2e9a 0%, #aa94ff 30%, #5dd1e3 50%, #aa94ff 70%, #ff2e9a 100%);
+  background-size: 12px 12px, 200% 100%;
+  background-position: 0 0, 0% 0;
+  box-shadow: 0 -2px 0 var(--tc-ink), 0 -10px 40px rgb(255 46 154 / 0.35);
+}
+
+.storefront-theme main :is(
+  section.bg-primary:has(input[aria-label="Rechercher un plat"]),
+  section.bg-primary:has(svg:is(.lucide-circle-check-big, .lucide-circle-check, .lucide-check-circle))
+) > div.absolute:first-child {
+  display: none;
+}
+
+.storefront-theme main :is(
+  section.bg-primary:has(input[aria-label="Rechercher un plat"]),
+  div.bg-primary:is(.pt-28, .pt-32):has(svg.lucide-shopping-bag),
+  section.bg-primary:has(svg:is(.lucide-circle-check-big, .lucide-circle-check, .lucide-check-circle))
+) h1 {
+  margin-inline: auto;
+  color: var(--tc-white) !important;
+  font-size: clamp(3.25rem, 13vw, 8.5rem) !important;
+  font-style: italic;
+  line-height: 0.86 !important;
+  letter-spacing: 0.004em !important;
+  text-transform: uppercase;
+  text-shadow: 0 0 0.5em rgb(170 148 255 / 0.35);
+  rotate: -2deg;
+}
+
+.storefront-theme main :is(
+  section.bg-primary:has(input[aria-label="Rechercher un plat"]),
+  div.bg-primary:is(.pt-28, .pt-32):has(svg.lucide-shopping-bag),
+  section.bg-primary:has(svg:is(.lucide-circle-check-big, .lucide-circle-check, .lucide-check-circle))
+) h1 > span:is(.italic, .not-italic, [class]) {
+  display: inline-block;
+  padding: 0 0.05em !important;
+  background: none !important;
+  border-radius: 0 !important;
+  color: #ffd9ec !important;
+  font-style: italic !important;
+  text-shadow:
+    0 0 0.02em #fff,
+    0 0 0.07em #ff2e9a,
+    0 0 0.2em #ff2e9a,
+    0 0 0.5em rgb(255 46 154 / 0.65),
+    0 0 1.1em rgb(245 120 176 / 0.45) !important;
+}
+
+.storefront-theme main :is(
+  section.bg-primary:has(input[aria-label="Rechercher un plat"]),
+  div.bg-primary:is(.pt-28, .pt-32):has(svg.lucide-shopping-bag),
+  section.bg-primary:has(svg:is(.lucide-circle-check-big, .lucide-circle-check, .lucide-check-circle))
+) :is(p, a:not([data-slot="button"])) {
+  color: var(--tc-text-2) !important;
+}
+
+.storefront-theme main :is(
+  section.bg-primary:has(input[aria-label="Rechercher un plat"]),
+  section.bg-primary:has(svg:is(.lucide-circle-check-big, .lucide-circle-check, .lucide-check-circle))
+) [data-slot="badge"] {
+  display: inline-block;
+  padding: 0.38em 0.8em 0.42em;
+  border: 0 !important;
+  border-radius: 0.5em !important;
+  background: var(--tc-pink) !important;
+  color: var(--tc-ink) !important;
+  font-family: var(--tc-font-text);
+  font-size: 0.9375rem !important;
+  font-weight: 800;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  rotate: -2.5deg;
+  box-shadow: 0 0 0 2px var(--tc-ink), 0 0 22px rgb(255 46 154 / 0.45) !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* cart and order: the icon is a pink disc that hangs like a balloon */
+.storefront-theme main :is(
+  div.bg-primary:is(.pt-28, .pt-32):has(svg.lucide-shopping-bag),
+  section.bg-primary:has(svg:is(.lucide-circle-check-big, .lucide-circle-check, .lucide-check-circle))
+) div[class*="bg-white/20"] {
+  border-radius: 50% !important;
+  background: var(--tc-pink) !important;
+  box-shadow: 0 0 0 2px var(--tc-ink), 0 0 26px rgb(255 46 154 / 0.6);
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.storefront-theme main :is(
+  div.bg-primary:is(.pt-28, .pt-32):has(svg.lucide-shopping-bag),
+  section.bg-primary:has(svg:is(.lucide-circle-check-big, .lucide-circle-check, .lucide-check-circle))
+) div[class*="bg-white/20"] svg {
+  color: var(--tc-ink) !important;
+}
+
+/* ═══════════════════════════ 2. /menu: « Le comptoir LED » ═══════════════════════════ */
+
+/* the search pill: white, ink text (18.8:1), cyan halo when focused */
+.storefront-theme main section.bg-primary:has(input[aria-label="Rechercher un plat"]) .bg-card {
+  border: 0 !important;
+  border-radius: var(--tc-r-pill) !important;
+  padding: 6px !important;
+  background: #fff !important;
+  box-shadow: 0 0 0 2px var(--tc-ink), 0 18px 40px -16px rgb(0 0 0 / 0.8) !important;
+  transition: box-shadow var(--tc-dur-2) ease;
+}
+
+.storefront-theme main section.bg-primary:has(input[aria-label="Rechercher un plat"]) .bg-card:focus-within {
+  box-shadow: 0 0 0 2px var(--tc-ink), 0 0 0 6px var(--tc-cyan), 0 0 34px rgb(93 209 227 / 0.6) !important;
+}
+
+.storefront-theme main section.bg-primary:has(input[aria-label="Rechercher un plat"]) .bg-card > div:first-child {
+  padding-left: 1rem !important;
+}
+
+.storefront-theme main section.bg-primary:has(input[aria-label="Rechercher un plat"]) .bg-card svg {
+  color: var(--tc-ink) !important;
+}
+
+.storefront-theme main section.bg-primary:has(input[aria-label="Rechercher un plat"]) input[aria-label="Rechercher un plat"] {
+  min-width: 0;
+  height: 3.25rem !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  color: var(--tc-ink) !important;
+  font-size: 1.0625rem !important;
+}
+
+.storefront-theme main section.bg-primary:has(input[aria-label="Rechercher un plat"]) input[aria-label="Rechercher un plat"]::placeholder {
+  color: #5b4d57 !important;
+}
+
+.storefront-theme main section.bg-primary:has(input[aria-label="Rechercher un plat"]) .bg-card [data-slot="button"] {
+  height: 3.25rem !important;
+  padding: 0 1.4rem !important;
+  border-radius: var(--tc-r-pill) !important;
+  font-size: 1.125rem !important;
+}
+
+.storefront-theme main section.bg-primary:has(input[aria-label="Rechercher un plat"]) .bg-card button:not([data-slot]) {
+  color: var(--tc-ink) !important;
+}
+
+@media (max-width: 479px) {
+  .storefront-theme main section.bg-primary:has(input[aria-label="Rechercher un plat"]) .bg-card [data-slot="button"] {
+    padding: 0 1rem !important;
+  }
+
+  .storefront-theme main section.bg-primary:has(input[aria-label="Rechercher un plat"]) .bg-card > div:first-child {
+    display: none;
+  }
+
+  .storefront-theme main section.bg-primary:has(input[aria-label="Rechercher un plat"]) input[aria-label="Rechercher un plat"] {
+    padding-left: 1rem !important;
+  }
+}
+
+/* The catalogue section: no shouting capitals on descriptions. */
+.storefront-theme main section.uppercase:has(.storefront-menu, [data-slot="skeleton"]) {
+  text-transform: none;
+  padding-top: 2.25rem !important;
+}
+
+/* family pills: slab pills; the active one is the pink tube */
+.storefront-theme main section.uppercase > div:first-child {
+  gap: 0.6rem !important;
+  margin-bottom: 1.5rem !important;
+  padding-top: 0.5rem !important;
+  padding-bottom: 1rem !important;
+}
+
+.storefront-theme main section.uppercase > div:first-child > button {
+  height: 3rem !important;
+  padding: 0 1.3rem !important;
+  border: 0 !important;
+  border-radius: var(--tc-r-pill) !important;
+  background: var(--tc-slab) !important;
+  color: var(--tc-text) !important;
+  font-family: var(--tc-font-display);
+  font-size: 1.1875rem !important;
+  font-weight: 850 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase;
+  box-shadow: inset 0 0 0 2px var(--tc-line) !important;
+  transition: background-color var(--tc-dur-1) ease, box-shadow var(--tc-dur-2) ease, translate var(--tc-dur-2) var(--tc-ease-snap) !important;
+}
+
+.storefront-theme:not(.dark *) main section.uppercase > div:first-child > button {
+  box-shadow: inset 0 0 0 2px var(--tc-ink) !important;
+}
+
+.storefront-theme main section.uppercase > div:first-child > button:hover {
+  translate: 0 -2px;
+  box-shadow: inset 0 0 0 2px var(--tc-cyan), 0 0 16px rgb(93 209 227 / calc(0.5 * var(--tc-glow))) !important;
+}
+
+.storefront-theme main section.uppercase > div:first-child > button[class*="bg-primary"] {
+  background: var(--tc-pink) !important;
+  color: var(--tc-ink) !important;
+  box-shadow: 0 0 0 2px var(--tc-ink), 0 0 22px rgb(255 46 154 / calc(0.55 * var(--tc-glow))) !important;
+}
+
+/* the sparkle emoji of « Tout » is decoration */
+.storefront-theme main section.uppercase > div:first-child > button > span.text-xl {
+  display: none;
+}
+
+/* « Affichage : … » row: a strip of the LED counter, the text on an ink plate */
+.storefront-theme main section.uppercase > div:has(> div > h2) {
+  margin-bottom: 2rem !important;
+  padding: 10px !important;
+  gap: 10px !important;
+  border-radius: 1.5rem;
+  background-color: var(--tc-night);
+  background-image:
+    var(--tc-led),
+    linear-gradient(100deg, #ff2e9a 0%, #aa94ff 30%, #5dd1e3 50%, #aa94ff 70%, #ff2e9a 100%);
+  background-size: 12px 12px, 200% 100%;
+  background-position: 0 0, 0% 0;
+  box-shadow: 0 0 0 2px var(--tc-ink), 0 0 34px rgb(255 46 154 / calc(0.3 * var(--tc-glow)));
+}
+
+.storefront-theme main section.uppercase > div:has(> div > h2) > div:first-child {
+  padding: 0.7rem 1.2rem;
+  border-radius: 1rem;
+  background: var(--tc-night);
+}
+
+.storefront-theme main section.uppercase > div:has(> div > h2) h2 {
+  color: var(--tc-white) !important;
+  font-size: clamp(1.5rem, 4vw, 2rem) !important;
+  letter-spacing: 0.03em !important;
+}
+
+.storefront-theme main section.uppercase > div:has(> div > h2) h2 > span:first-of-type {
+  color: var(--tc-pink) !important;
+  text-shadow: 0 0 12px rgb(255 46 154 / 0.6);
+}
+
+.storefront-theme main section.uppercase > div:has(> div > h2) h2 > span:last-of-type {
+  color: #c9bcc5 !important;
+}
+
+.storefront-theme main section.uppercase > div:has(> div > h2) [data-slot] {
+  height: 3rem !important;
+  border-radius: var(--tc-r-pill) !important;
+  box-shadow: 0 0 0 2px var(--tc-ink) !important;
+}
+
+.storefront-theme main section.uppercase > div:has(> div > h2) > div:last-child > button {
+  padding-inline: 1.2rem !important;
+  border: 0 !important;
+  background: #fff !important;
+  color: var(--tc-pink-deep) !important;
+  font-family: var(--tc-font-display);
+  font-size: 1.0625rem !important;
+  font-weight: 850 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase;
+}
+
+.storefront-theme main section.uppercase > div:has(> div > h2) [data-slot] span {
+  color: var(--tc-pink-deep) !important;
+}
+
+/* Formules (when the shop has some): slabs with a violet tube. */
+.storefront-theme main section.uppercase > div.mb-12:has(> h2 + div.grid) > h2 {
+  font-size: clamp(2rem, 6vw, 3.5rem) !important;
+  text-transform: uppercase;
+}
+
+/* ── Dish cards ─────────────────────────────────────────────────────────── */
+.storefront-theme .storefront-menu {
+  gap: 14px !important;
+}
+
+@media (min-width: 640px) {
+  .storefront-theme .storefront-menu {
+    gap: 20px !important;
+  }
+}
+
+.storefront-theme .storefront-menu-item {
+  position: relative;
+  border: 0 !important;
+  border-radius: var(--tc-r-card) !important;
+  background: var(--tc-slab) !important;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.07), 0 24px 40px -28px rgb(0 0 0 / 0.9) !important;
+  transform: perspective(900px) rotateX(var(--tc-rx, 0deg)) rotateY(var(--tc-ry, 0deg));
+  transition: transform 0.6s var(--tc-ease-out), box-shadow var(--tc-dur-2) ease !important;
+}
+
+.storefront-theme:not(.dark *) .storefront-menu-item {
+  box-shadow: 0 0 0 2px var(--tc-ink), 0 22px 40px -26px rgb(14 58 66 / 0.75) !important;
+}
+
+/* the neon edge lights up on hover */
+.storefront-theme .storefront-menu-item:is(:hover, :focus-within) {
+  box-shadow: var(--tc-box-pink), 0 30px 50px -30px rgb(0 0 0 / 0.9) !important;
+}
+
+.storefront-theme .storefront-menu-item::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(40% 40% at var(--tc-gx, 50%) var(--tc-gy, 50%), rgb(255 255 255 / 0.18), transparent 70%);
+  opacity: 0;
+  transition: opacity var(--tc-dur-2) ease;
+}
+
+.storefront-theme .storefront-menu-item[data-tc-tilting] {
+  transition-duration: 90ms, var(--tc-dur-2) !important;
+  will-change: transform;
+}
+
+/* photo: square, the whole box and its lid in frame */
+.storefront-theme .storefront-menu-photo {
+  aspect-ratio: 1 / 1 !important;
+  flex: none;
+  background: #0b080c !important;
+  border-radius: var(--tc-r-card) var(--tc-r-card) 0 0;
+}
+
+.storefront-theme .storefront-menu-photo img {
+  object-fit: cover;
+  object-position: 50% 42%;
+  transition: scale 0.7s var(--tc-ease-out) !important;
+}
+
+.storefront-theme .storefront-menu-item:hover .storefront-menu-photo img {
+  scale: 1.06 !important;
+}
+
+/* badges on the photo: cyan caption pills (ink 10.49:1) */
+.storefront-theme .storefront-menu-photo > div.absolute.top-4.left-4 > * {
+  padding: 0.3em 0.6em 0.34em !important;
+  border-radius: 0.45em !important;
+  background: var(--tc-cyan) !important;
+  color: var(--tc-ink) !important;
+  font-family: var(--tc-font-text);
+  font-size: 0.75rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.02em !important;
+  box-shadow: 0 0 0 2px var(--tc-ink) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* unavailable dish: the photo dims under a night veil */
+.storefront-theme .storefront-menu-photo > div.absolute.inset-0 {
+  background: rgb(11 8 12 / 0.55) !important;
+}
+
+.storefront-theme .storefront-menu-fav {
+  width: 2.75rem !important;
+  height: 2.75rem !important;
+  border: 0 !important;
+  background: rgb(20 16 21 / 0.82) !important;
+  color: var(--tc-white) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.storefront-theme .storefront-menu-fav svg {
+  width: 1.15rem !important;
+  height: 1.15rem !important;
+}
+
+.storefront-theme .storefront-menu-fav svg:not([class*="fill-"]) {
+  color: var(--tc-white) !important;
+}
+
+.storefront-theme .storefront-menu-fav:hover {
+  background: var(--tc-pink) !important;
+  scale: 1.06;
+}
+
+.storefront-theme .storefront-menu-fav:hover svg {
+  color: var(--tc-ink) !important;
+}
+
+.storefront-theme .storefront-menu-body {
+  padding: 1.1rem 1.2rem 1.25rem !important;
+}
+
+.storefront-theme .storefront-menu-name {
+  margin-bottom: 0.45rem !important;
+}
+
+.storefront-theme .storefront-menu-name :is(button, span) {
+  color: var(--tc-text) !important;
+  font-family: var(--tc-font-display);
+  font-size: clamp(1.35rem, 2.2vw, 1.75rem) !important;
+  font-weight: 900 !important;
+  line-height: 0.95 !important;
+  letter-spacing: 0.01em !important;
+  text-transform: uppercase;
+  -webkit-line-clamp: 2 !important;
+  line-clamp: 2;
+}
+
+.storefront-theme .storefront-menu-name .line-clamp-1 {
+  /* the condensed capitals overhang their box: keep the first letter whole */
+  padding-inline: 0.08em 0.04em;
+  margin-inline-start: -0.08em;
+  text-wrap: wrap !important;
+}
+
+.storefront-theme .storefront-menu-item:hover .storefront-menu-name :is(button, span) {
+  color: var(--tc-word) !important;
+}
+
+.storefront-theme .storefront-menu-desc {
+  color: var(--tc-text-2) !important;
+  font-size: 0.875rem !important;
+  line-height: 1.45 !important;
+  text-transform: none !important;
+}
+
+.storefront-theme .storefront-menu-foot {
+  align-items: flex-end !important;
+}
+
+.storefront-theme .storefront-menu-price > span:first-child {
+  color: var(--tc-text-2) !important;
+  font-size: 0.6875rem !important;
+}
+
+.storefront-theme .storefront-menu-price > span.text-xl {
+  color: var(--tc-word) !important;
+  font-family: var(--tc-font-display);
+  font-size: clamp(1.9rem, 3vw, 2.25rem) !important;
+  font-weight: 950 !important;
+  font-style: italic;
+  letter-spacing: 0.01em;
+}
+
+.dark .storefront-theme .storefront-menu-price > span.text-xl {
+  text-shadow: 0 0 14px rgb(255 46 154 / 0.45);
+}
+
+.storefront-theme .storefront-menu-price > span.line-through {
+  color: var(--tc-text-2) !important;
+}
+
+.storefront-theme .storefront-menu-add {
+  flex: none;
+  width: 3.25rem !important;
+  height: 3.25rem !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+}
+
+.storefront-theme div.storefront-menu-add {
+  background: var(--tc-slab-2) !important;
+  color: var(--tc-text-2) !important;
+}
+
+/* phone: one row per dish, photo left, the price always in sight */
+@media (max-width: 639px) {
+  .storefront-theme .storefront-menu-item {
+    flex-direction: row !important;
+  }
+
+  .storefront-theme .storefront-menu-photo {
+    width: 40%;
+    border-radius: var(--tc-r-card) 0 0 var(--tc-r-card);
+  }
+
+  .storefront-theme .storefront-menu-photo > div.absolute.top-4.left-4 {
+    top: 0.5rem !important;
+    left: 0.5rem !important;
+  }
+
+  .storefront-theme .storefront-menu-fav {
+    top: 0.5rem !important;
+    right: 0.5rem !important;
+  }
+
+  .storefront-theme .storefront-menu-body {
+    min-width: 0;
+    padding: 0.85rem 0.9rem 0.9rem !important;
+  }
+
+  .storefront-theme .storefront-menu-name :is(button, span) {
+    font-size: 1.3rem !important;
+  }
+
+  .storefront-theme .storefront-menu-desc {
+    margin-bottom: 0.6rem !important;
+    font-size: 0.8125rem !important;
+  }
+
+  .storefront-theme .storefront-menu-price > span.text-xl {
+    font-size: 1.7rem !important;
+  }
+
+  .storefront-theme .storefront-menu-add {
+    width: 2.875rem !important;
+    height: 2.875rem !important;
+  }
+}
+
+/* « Besoin d'aide » (engine copy): the turquoise wall, ink text (10.49:1) */
+.storefront-theme main > div:has(input[aria-label="Rechercher un plat"]) > section > div.bg-primary {
+  border-radius: var(--tc-r-slab) !important;
+  padding: clamp(2rem, 6vw, 4.5rem) !important;
+  background: var(--tc-cyan) !important;
+  color: var(--tc-ink);
+  box-shadow: 0 0 0 2px var(--tc-ink), 0 0 50px rgb(93 209 227 / calc(0.35 * var(--tc-glow))) !important;
+}
+
+.storefront-theme main > div:has(input[aria-label="Rechercher un plat"]) > section > div.bg-primary > div.absolute {
+  display: none;
+}
+
+.storefront-theme main > div:has(input[aria-label="Rechercher un plat"]) > section > div.bg-primary :is(h2, p) {
+  color: var(--tc-ink) !important;
+}
+
+.storefront-theme main > div:has(input[aria-label="Rechercher un plat"]) > section > div.bg-primary h2 {
+  font-size: clamp(2.5rem, 7vw, 4.75rem) !important;
+  text-transform: uppercase;
+}
+
+.storefront-theme main > div:has(input[aria-label="Rechercher un plat"]) > section > div.bg-primary h2 > span:is(.italic, .not-italic, [class]) {
+  display: inline-block;
+  padding: 0.02em 0.16em 0.06em !important;
+  border-radius: 0.14em !important;
+  background: var(--tc-pink) !important;
+  color: var(--tc-ink) !important;
+  font-style: italic !important;
+  text-shadow: none !important;
+  rotate: -2deg;
+  box-shadow: 0 0 0 3px var(--tc-ink);
+}
+
+.storefront-theme main > div:has(input[aria-label="Rechercher un plat"]) > section > div.bg-primary [data-slot="badge"] {
+  border: 0 !important;
+  border-radius: 0.5em !important;
+  background: var(--tc-ink) !important;
+  color: var(--tc-white) !important;
+  font-family: var(--tc-font-text);
+  font-size: 0.9375rem !important;
+  font-weight: 800;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  rotate: -2.5deg;
+}
+
+.storefront-theme main > div:has(input[aria-label="Rechercher un plat"]) > section > div.bg-primary [data-slot="button"] {
+  height: 3.75rem !important;
+  border-radius: var(--tc-r-pill) !important;
+  box-shadow: 0 0 0 2px var(--tc-ink) !important;
+}
+
+/* The menu's blog teaser (engine), when there are articles. */
+.storefront-theme main > div:has(input[aria-label="Rechercher un plat"]) > section.bg-card {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.storefront-theme main > div:has(input[aria-label="Rechercher un plat"]) > section.bg-card a[href^="/blog/"] > div {
+  border: 0 !important;
+  border-radius: var(--tc-r-card) !important;
+  background: var(--tc-slab) !important;
+}
+
+/* its cards: caption titles, a ghost link made a pill */
+.storefront-theme main > div:has(input[aria-label="Rechercher un plat"]) > section.bg-card h2 {
+  font-size: clamp(2.75rem, 7vw, 5rem) !important;
+  text-transform: uppercase;
+}
+
+.storefront-theme main > div:has(input[aria-label="Rechercher un plat"]) > section.bg-card [data-slot="button"][data-variant="ghost"] {
+  height: 3rem;
+  padding-inline: 1.3rem;
+  background: #fff !important;
+  color: var(--tc-pink-deep) !important;
+  font-family: var(--tc-font-display);
+  font-size: 1.0625rem !important;
+  box-shadow: 0 0 0 2px var(--tc-ink);
+}
+
+.storefront-theme main > div:has(input[aria-label="Rechercher un plat"]) > section.bg-card a[href^="/blog/"] h3 {
+  align-self: flex-start;
+  padding: 0.12em 0.42em 0.16em;
+  border-radius: 0.42em;
+  background: var(--tc-pink);
+  color: var(--tc-ink) !important;
+  font-family: var(--tc-font-text);
+  font-size: 1.125rem !important;
+  font-weight: 800 !important;
+  line-height: 1.45 !important;
+  letter-spacing: 0 !important;
+}
+
+.storefront-theme main > div:has(input[aria-label="Rechercher un plat"]) > section.bg-card a[href^="/blog/"] .absolute.top-4.left-4 {
+  border: 0 !important;
+  border-radius: var(--tc-r-pill) !important;
+  background: var(--tc-cyan) !important;
+}
+
+.storefront-theme main > div:has(input[aria-label="Rechercher un plat"]) > section.bg-card a[href^="/blog/"] .absolute.top-4.left-4 p {
+  color: var(--tc-ink) !important;
+}
+
+.storefront-theme main > div:has(input[aria-label="Rechercher un plat"]) > section.bg-card a[href^="/blog/"] :is(.text-accent-foreground) {
+  color: var(--tc-word) !important;
+}
+
+/* ═══════════════════════════ 3. Product dialog ═══════════════════════════ */
+
+.storefront-theme[data-slot="dialog-content"]:has(h2) {
+  padding: 0 !important;
+  overflow-x: clip;
+}
+
+/* the dish on the night counter, never cropped (object-fit: contain) */
+.storefront-theme[data-slot="dialog-content"] .relative.aspect-video {
+  aspect-ratio: auto !important;
+  height: min(40svh, 360px);
+  background:
+    radial-gradient(60% 80% at 15% 30%, rgb(245 120 176 / 0.35), transparent 70%),
+    radial-gradient(60% 80% at 85% 30%, rgb(93 209 227 / 0.3), transparent 70%),
+    #0b080c !important;
+}
+
+.storefront-theme[data-slot="dialog-content"] .relative.aspect-video img {
+  object-fit: contain !important;
+}
+
+.storefront-theme[data-slot="dialog-content"] .relative.aspect-video > div.absolute.top-6.left-6 > span {
+  border-radius: 0.45em !important;
+  background: var(--tc-cyan) !important;
+  color: var(--tc-ink) !important;
+  font-family: var(--tc-font-text);
+  font-weight: 800 !important;
+  box-shadow: 0 0 0 2px var(--tc-ink);
+}
+
+.storefront-theme[data-slot="dialog-content"] .relative.aspect-video > div.absolute.top-6.right-6 button {
+  border: 0;
+  background: rgb(20 16 21 / 0.82) !important;
+  color: var(--tc-white) !important;
+}
+
+.storefront-theme[data-slot="dialog-content"] > button:last-child,
+.storefront-theme[data-slot="dialog-content"] [data-slot="dialog-close"] {
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50% !important;
+  background: var(--tc-pink) !important;
+  color: var(--tc-ink) !important;
+  opacity: 1 !important;
+  box-shadow: 0 0 0 2px var(--tc-ink), 0 0 18px rgb(255 46 154 / 0.55);
+}
+
+.storefront-theme[data-slot="dialog-content"] :is(> button:last-child, [data-slot="dialog-close"]) svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.storefront-theme[data-slot="dialog-content"] .p-10 {
+  padding: clamp(1.25rem, 4vw, 2.25rem) !important;
+}
+
+.storefront-theme[data-slot="dialog-content"] h2 {
+  font-size: clamp(2.25rem, 7vw, 3.5rem) !important;
+  font-style: italic;
+  line-height: 0.9 !important;
+  color: var(--tc-text) !important;
+}
+
+.storefront-theme[data-slot="dialog-content"] h2 + p,
+.storefront-theme[data-slot="dialog-content"] .space-y-4 > p {
+  color: var(--tc-text-2) !important;
+  font-size: 1rem !important;
+}
+
+/* option tiles: slab with a line, the chosen one lit pink */
+.storefront-theme[data-slot="dialog-content"] label.rounded-2xl {
+  border: 2px solid var(--tc-line) !important;
+  border-radius: 1rem !important;
+  background: var(--tc-slab) !important;
+  transition: border-color var(--tc-dur-1) ease, box-shadow var(--tc-dur-2) ease;
+}
+
+.storefront-theme[data-slot="dialog-content"] label.rounded-2xl:has(input:checked) {
+  border-color: var(--tc-pink) !important;
+  box-shadow: 0 0 16px rgb(255 46 154 / calc(0.4 * var(--tc-glow)));
+}
+
+.storefront-theme:not(.dark *)[data-slot="dialog-content"] label.rounded-2xl:has(input:checked) {
+  border-color: var(--tc-pink-deep) !important;
+}
+
+/* price: huge, leaning, in the word colour */
+.storefront-theme[data-slot="dialog-content"] span.text-4xl.text-accent-foreground {
+  color: var(--tc-word) !important;
+  font-family: var(--tc-font-display);
+  font-size: clamp(2.6rem, 8vw, 3.5rem) !important;
+  font-weight: 950 !important;
+  font-style: italic;
+}
+
+.dark .storefront-theme[data-slot="dialog-content"] span.text-4xl.text-accent-foreground,
+.dark.storefront-theme[data-slot="dialog-content"] span.text-4xl.text-accent-foreground {
+  text-shadow: 0 0 16px rgb(255 46 154 / 0.5);
+}
+
+/* quantity: a pill, round steppers */
+.storefront-theme[data-slot="dialog-content"] div.bg-muted.rounded-2xl.h-16 {
+  height: 3.5rem !important;
+  padding: 0.3rem !important;
+  border: 0 !important;
+  border-radius: var(--tc-r-pill) !important;
+  background: var(--tc-slab-2) !important;
+}
+
+.storefront-theme[data-slot="dialog-content"] div.bg-muted.rounded-2xl.h-16 button {
+  width: 2.9rem !important;
+  height: 2.9rem !important;
+  border-radius: 50% !important;
+  color: var(--tc-text) !important;
+}
+
+.storefront-theme[data-slot="dialog-content"] div.bg-muted.rounded-2xl.h-16 button:hover {
+  background: var(--tc-pink) !important;
+  color: var(--tc-ink) !important;
+}
+
+.storefront-theme[data-slot="dialog-content"] button.h-16 {
+  height: 3.5rem !important;
+  border-radius: var(--tc-r-pill) !important;
+}
+
+@media (max-width: 479px) {
+  .storefront-theme[data-slot="dialog-content"] .flex.items-center.justify-between.pt-6 {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+}
+
+/* ═══════════════════════════ 4. /cart ═══════════════════════════ */
+
+.storefront-theme main > div.min-h-screen:has(> div.bg-primary svg.lucide-shopping-bag) > div.container {
+  margin-top: 2rem !important;
+}
+
+/* toolbar, items and summary: slabs on the ground */
+.storefront-theme main > div.min-h-screen:has(> div.bg-primary svg.lucide-shopping-bag) :is(.rounded-\[2rem\].border.bg-card, .group.rounded-\[2rem\]) {
+  border: 0 !important;
+  border-radius: var(--tc-r-card) !important;
+  background: var(--tc-slab) !important;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.07), 0 22px 36px -26px rgb(0 0 0 / 0.9) !important;
+}
+
+.storefront-theme:not(.dark *) main > div.min-h-screen:has(> div.bg-primary svg.lucide-shopping-bag) :is(.rounded-\[2rem\].border.bg-card, .group.rounded-\[2rem\]) {
+  box-shadow: 0 0 0 2px var(--tc-ink), 0 20px 36px -24px rgb(14 58 66 / 0.75) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> div.bg-primary svg.lucide-shopping-bag) .group.rounded-\[2rem\]:hover {
+  box-shadow: var(--tc-box-pink) !important;
+}
+
+/* the back arrow: a cyan disc */
+.storefront-theme main > div.min-h-screen:has(> div.bg-primary svg.lucide-shopping-bag) a[href="/menu"]:has(> svg.lucide-arrow-left):not(:has(span)) {
+  width: 2.75rem !important;
+  height: 2.75rem !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: var(--tc-cyan) !important;
+  color: var(--tc-ink) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> div.bg-primary svg.lucide-shopping-bag) .group.rounded-\[2rem\] > div:first-child {
+  border: 0 !important;
+  border-radius: 1rem !important;
+  background: #0b080c !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> div.bg-primary svg.lucide-shopping-bag) .group.rounded-\[2rem\] h3 {
+  color: var(--tc-text) !important;
+  font-family: var(--tc-font-display);
+  font-size: clamp(1.3rem, 3vw, 1.6rem) !important;
+  font-weight: 900 !important;
+  line-height: 0.95 !important;
+  letter-spacing: 0.01em !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> div.bg-primary svg.lucide-shopping-bag) .group.rounded-\[2rem\] p.text-accent-foreground {
+  color: var(--tc-word) !important;
+  font-family: var(--tc-font-display);
+  font-size: 1.5rem !important;
+  font-weight: 950 !important;
+  font-style: italic;
+}
+
+.storefront-theme main > div.min-h-screen:has(> div.bg-primary svg.lucide-shopping-bag) .group.rounded-\[2rem\] .rounded-lg.border.bg-muted {
+  padding: 3px !important;
+  border: 0 !important;
+  border-radius: var(--tc-r-pill) !important;
+  background: var(--tc-slab-2) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> div.bg-primary svg.lucide-shopping-bag) .group.rounded-\[2rem\] .rounded-lg.border.bg-muted button {
+  width: 2.25rem !important;
+  height: 2.25rem !important;
+  border-radius: 50% !important;
+  color: var(--tc-text) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> div.bg-primary svg.lucide-shopping-bag) .group.rounded-\[2rem\] .rounded-lg.border.bg-muted button:hover {
+  background: var(--tc-pink) !important;
+  color: var(--tc-ink) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> div.bg-primary svg.lucide-shopping-bag) .group.rounded-\[2rem\] .rounded-lg.border.bg-muted > span {
+  color: var(--tc-text) !important;
+  font-size: 0.9375rem !important;
+}
+
+/* the summary: a slab under a neon tube, the total in poster capitals */
+.storefront-theme main > div.min-h-screen:has(> div.bg-primary svg.lucide-shopping-bag) .lg\:sticky {
+  top: calc(var(--tc-bar-h) + var(--tc-bar-top) + 1.25rem) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> div.bg-primary svg.lucide-shopping-bag) .lg\:sticky > div {
+  position: relative;
+  overflow: clip;
+  padding: 1.75rem !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> div.bg-primary svg.lucide-shopping-bag) .lg\:sticky > div::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: var(--tc-neon-line);
+  box-shadow: 0 0 12px rgb(255 46 154 / 0.7);
+}
+
+.storefront-theme main > div.min-h-screen:has(> div.bg-primary svg.lucide-shopping-bag) .lg\:sticky h2 {
+  color: var(--tc-text) !important;
+  font-size: 1.875rem !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> div.bg-primary svg.lucide-shopping-bag) .lg\:sticky .rounded-2xl.bg-primary\/10 {
+  border-radius: 50% !important;
+  background: var(--tc-pink) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> div.bg-primary svg.lucide-shopping-bag) .lg\:sticky .rounded-2xl.bg-primary\/10 svg {
+  color: var(--tc-ink) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> div.bg-primary svg.lucide-shopping-bag) .lg\:sticky .text-accent-foreground {
+  color: var(--tc-word) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> div.bg-primary svg.lucide-shopping-bag) .lg\:sticky span.text-2xl.text-accent-foreground {
+  font-family: var(--tc-font-display);
+  font-size: clamp(2.4rem, 5vw, 3rem) !important;
+  font-weight: 950 !important;
+  font-style: italic;
+}
+
+.dark .storefront-theme main > div.min-h-screen:has(> div.bg-primary svg.lucide-shopping-bag) .lg\:sticky span.text-2xl.text-accent-foreground {
+  text-shadow: 0 0 16px rgb(255 46 154 / 0.5);
+}
+
+.storefront-theme main > div.min-h-screen:has(> div.bg-primary svg.lucide-shopping-bag) .lg\:sticky button.h-16 {
+  height: 3.75rem !important;
+  border-radius: var(--tc-r-pill) !important;
+  font-size: 1.25rem !important;
+}
+
+/* ═══════════════════════════ 5. /checkout ═══════════════════════════ */
+
+.storefront-theme main div.bg-muted.pt-32:has(> div > header) {
+  background: transparent !important;
+  padding-top: calc(var(--tc-bar-h) + var(--tc-bar-top) + 2.5rem) !important;
+}
+
+.storefront-theme:has(> div.fixed.top-0.h-10) main div.bg-muted.pt-32:has(> div > header) {
+  padding-top: calc(var(--tc-bar-h) + var(--tc-bar-top) + 40px + 2.5rem) !important;
+}
+
+.storefront-theme main div.bg-muted.pt-32 > div > header h1 {
+  font-size: clamp(3.25rem, 11vw, 7rem) !important;
+  line-height: 0.86 !important;
+  rotate: -2deg;
+  transform-origin: 0 100%;
+}
+
+/* the LED rail under the title */
+.storefront-theme main div.bg-muted.pt-32 > div > header::after {
+  content: "";
+  display: block;
+  height: 16px;
+  margin-top: 1.5rem;
+  border-radius: var(--tc-r-pill);
+  background-color: var(--tc-night);
+  background-image:
+    var(--tc-led),
+    linear-gradient(100deg, #ff2e9a 0%, #aa94ff 30%, #5dd1e3 50%, #aa94ff 70%, #ff2e9a 100%);
+  background-size: 10px 10px, 200% 100%;
+  box-shadow: 0 0 0 2px var(--tc-ink), 0 0 24px rgb(255 46 154 / calc(0.4 * var(--tc-glow)));
+}
+
+.storefront-theme main div.bg-muted.pt-32 > div > header a {
+  color: var(--tc-text-2) !important;
+}
+
+.storefront-theme main div.bg-muted.pt-32 h2 {
+  font-size: clamp(1.75rem, 4vw, 2.25rem) !important;
+  letter-spacing: 0.02em !important;
+}
+
+.storefront-theme main div.bg-muted.pt-32 .sticky {
+  top: calc(var(--tc-bar-h) + var(--tc-bar-top) + 1.25rem) !important;
+}
+
+.storefront-theme main div.bg-muted.pt-32 :is(.rounded-\[2rem\], .rounded-\[2\.5rem\], .rounded-\[3rem\]):is(.bg-card, .border) {
+  border-color: var(--tc-line) !important;
+  border-radius: var(--tc-r-card) !important;
+}
+
+.storefront-theme main div.bg-muted.pt-32 .text-accent-foreground {
+  color: var(--tc-word) !important;
+}
+
+.storefront-theme main div.bg-muted.pt-32 button.h-16 {
+  border-radius: var(--tc-r-pill) !important;
+}
+
+/* ═══════════════════════════ 6. /order and /track ═══════════════════════════ */
+
+.storefront-theme main > div:has(> section.bg-primary svg:is(.lucide-circle-check-big, .lucide-circle-check, .lucide-check-circle)) > div.max-w-4xl {
+  padding-top: 2.5rem !important;
+}
+
+/* « Suivre ma commande »: the cyan awning (ink 10.49:1) */
+.storefront-theme main a[href^="/track/"].bg-primary {
+  border-radius: var(--tc-r-card) !important;
+  background: var(--tc-cyan) !important;
+  color: var(--tc-ink) !important;
+  box-shadow: 0 0 0 2px var(--tc-ink), 0 0 30px rgb(93 209 227 / calc(0.45 * var(--tc-glow))) !important;
+  transition: translate var(--tc-dur-2) var(--tc-ease-snap) !important;
+}
+
+.storefront-theme main a[href^="/track/"].bg-primary :is(p, svg) {
+  color: var(--tc-ink) !important;
+}
+
+.storefront-theme main a[href^="/track/"].bg-primary p.text-lg {
+  font-family: var(--tc-font-display);
+  font-size: 1.75rem !important;
+  text-transform: uppercase;
+}
+
+.storefront-theme main a[href^="/track/"].bg-primary:hover {
+  translate: 0 -3px;
+}
+
+.storefront-theme main a[href^="/track/"].bg-primary > div:last-child {
+  border-radius: 50% !important;
+  background: var(--tc-ink) !important;
+}
+
+.storefront-theme main a[href^="/track/"].bg-primary > div:last-child svg {
+  color: var(--tc-cyan) !important;
+}
+
+/* /track: the order number in a pink tube, steps as a list of pills */
+.storefront-theme main:has(ol.space-y-3) h1.italic.text-4xl {
+  font-size: clamp(3rem, 10vw, 5.5rem) !important;
+  line-height: 0.88 !important;
+}
+
+.storefront-theme main:has(ol.space-y-3) h1.italic.text-4xl > span {
+  font-style: italic !important;
+}
+
+.storefront-theme main ol.space-y-3 > li {
+  border-radius: var(--tc-r-card);
+}
+
+/* ═══════════════════════════ 7. Closed banner ═══════════════════════════ */
+/* base.css paints it (ink on brand pink, 7.35:1); here it lights up once. */
+.storefront-theme > div.fixed.top-0.h-10 > div {
+  font-family: var(--tc-font-display);
+  font-size: 0.9375rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.08em !important;
+}
+
+/* ═══════════════════════════ 8. Motion ═══════════════════════════ */
+
+@media (prefers-reduced-motion: no-preference) {
+  /* the LED band of the shop headers sweeps once on arrival */
+  .storefront-theme main :is(
+    section.bg-primary:has(input[aria-label="Rechercher un plat"]),
+    div.bg-primary:is(.pt-28, .pt-32):has(svg.lucide-shopping-bag),
+    section.bg-primary:has(svg:is(.lucide-circle-check-big, .lucide-circle-check, .lucide-check-circle))
+  )::after {
+    animation: tc-s-led 2.6s var(--tc-ease-io) 0.2s both;
+  }
+
+  .storefront-theme main :is(
+    section.bg-primary:has(input[aria-label="Rechercher un plat"]),
+    div.bg-primary:is(.pt-28, .pt-32):has(svg.lucide-shopping-bag),
+    section.bg-primary:has(svg:is(.lucide-circle-check-big, .lucide-circle-check, .lucide-check-circle))
+  ) h1 > span {
+    animation: tc-flicker-on 1.3s linear 0.45s both;
+  }
+
+  .storefront-theme main :is(
+    section.bg-primary:has(input[aria-label="Rechercher un plat"]),
+    div.bg-primary:is(.pt-28, .pt-32):has(svg.lucide-shopping-bag),
+    section.bg-primary:has(svg:is(.lucide-circle-check-big, .lucide-circle-check, .lucide-check-circle))
+  ) h1 {
+    animation: tc-s-title 0.8s var(--tc-ease-out) both;
+  }
+
+  /* cart and order icon: a balloon that bobs three times, then rests */
+  .storefront-theme main :is(
+    div.bg-primary:is(.pt-28, .pt-32):has(svg.lucide-shopping-bag),
+    section.bg-primary:has(svg:is(.lucide-circle-check-big, .lucide-circle-check, .lucide-check-circle))
+  ) div[class*="bg-white/20"] {
+    animation: tc-s-bob 1.4s var(--tc-ease-io) 0.3s 3 both;
+  }
+
+  .storefront-theme main div.bg-muted.pt-32 > div > header::after {
+    animation: tc-s-led 2.4s var(--tc-ease-io) 0.3s both;
+  }
+
+  .storefront-theme > div.fixed.top-0.h-10 > div {
+    animation: tc-flicker-on 1.2s linear 0.4s both;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* the « Affichage » LED strip sweeps as it scrolls in */
+    .storefront-theme main section.uppercase > div:has(> div > h2) {
+      animation: tc-s-led-bg linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 55%;
+    }
+
+    /* dish cards rise and straighten, column by column */
+    .storefront-theme .storefront-menu > .storefront-menu-item {
+      animation: tc-rise-tilt linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 55%;
+    }
+
+    .storefront-theme .storefront-menu > .storefront-menu-item:nth-child(even) {
+      animation-range: entry 8% entry 63%;
+    }
+
+    /* cart lines slide in */
+    .storefront-theme main > div.min-h-screen:has(> div.bg-primary svg.lucide-shopping-bag) .group.rounded-\[2rem\] {
+      animation: tc-s-slide linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+  }
+}
+
+@keyframes tc-s-led {
+  from { background-position: 0 0, 100% 0; }
+  to { background-position: 0 0, 0% 0; }
+}
+
+@keyframes tc-s-led-bg {
+  from { background-position: 0 0, 100% 0; }
+  to { background-position: 0 0, 0% 0; }
+}
+
+@keyframes tc-s-title {
+  from { opacity: 0; translate: 0 0.3em; }
+  to { opacity: 1; translate: 0 0; }
+}
+
+@keyframes tc-s-bob {
+  0%, 100% { translate: 0 0; rotate: 0deg; }
+  50% { translate: 0 -8px; rotate: 4deg; }
+}
+
+@keyframes tc-s-slide {
+  from { opacity: 0; translate: -1.5rem 0; }
+  to { opacity: 1; translate: 0 0; }
+}
+
+/* order and track: the engine paints the order number with the dark button ink,
+   which vanishes on the night ground. The mode-aware text token fits both. */
+.storefront-theme main .font-mono.font-bold.text-primary-foreground {
+  color: var(--tc-text);
+}

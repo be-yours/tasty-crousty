@@ -1,0 +1,323 @@
+/*
+ * Site theme — CLIENT ZONE.
+ *
+ * This file is loaded AFTER app/globals.css: any variable redefined here
+ * overrides the engine's default theme, in light mode as in dark.
+ * A template update never overwrites it.
+ *
+ * The available tokens are those of app/globals.css (HSL without hsl()):
+ *   --primary, --secondary, --accent, --background, --foreground, --card,
+ *   --muted, --border, --input, --ring, --radius, --success, --warning, --info,
+ *   --status-pending … --status-cancelled, --chart-1 … --chart-5
+ *
+ * NAME BOTH SELECTORS, OR YOU REPAINT THE ADMIN AND NOT THE SHOP.
+ *
+ * app/globals.css declares the storefront's palette on `.storefront-theme` — a
+ * <div> in components/storefront/storefront-shell.tsx, not on <html> — and a
+ * custom property declared ON an element beats the one it would have INHERITED,
+ * whatever the layer or the specificity. So `:root { --primary: … }` alone
+ * recolours the dashboard and the sign-in pages, and leaves the shop the
+ * engine's green. Write the pair:
+ *
+ *     :root,
+ *     .storefront-theme { … }
+ *
+ *     .dark,
+ *     .dark .storefront-theme { … }
+ *
+ * Every template under templates/ is generated that way
+ * (scripts/gen-templates.mjs). This file is the one written by hand, which is
+ * why the rule is spelled out here. It is the same defect #410 found one layer
+ * down, in StoreTheme, and the same fix: name the element.
+ *
+ * Sidebar tokens are the exception and stay on `:root` / `.dark`:
+ * `.storefront-theme` declares none of them, and there is no sidebar on the
+ * shop, so scoping them would add a selector that paints nothing.
+ *
+ * Two tokens are easy to get wrong, so they are called out:
+ *
+ *   --primary-ink  the brand colour a WORD is written in, as opposed to
+ *                  --primary, which a BUTTON is filled with. Override --primary
+ *                  and you must override this too, or every word in
+ *                  `text-primary-ink` keeps the engine's orange. It has to
+ *                  clear 4.5:1 on --background, --card, --muted and --accent.
+ *   --input        the BOUNDARY of a form field, and not the same thing as
+ *                  --border, which is a decorative separator. WCAG 1.4.11 asks
+ *                  3:1 of it against --background, because a user has to find
+ *                  the field. Setting it equal to --border is the mistake that
+ *                  once shipped in all 51 templates.
+ *
+ * Example — moving the default orange accent to a brick red, on both:
+ *
+ *   :root,
+ *   .storefront-theme {
+ *     --primary: 8 76% 45%;
+ *     --primary-ink: 8 76% 38%;
+ *     --ring: 8 76% 45%;
+ *     --accent: 8 70% 96%;
+ *     --accent-foreground: 8 76% 30%;
+ *   }
+ *
+ *   .dark,
+ *   .dark .storefront-theme {
+ *     --primary: 8 80% 55%;
+ *     --primary-ink: 8 80% 62%;
+ *   }
+ */
+
+/*
+ * ── TASTY CROUSTY · « Vice City Crousty » ──────────────────────────────────
+ * Contract: site/ART_DIRECTION.md (read it before writing a page sheet).
+ *
+ * TWO MODES, ONE BRAND. Night is the default (site.config.ts theme.default =
+ * "dark"): the black shopfront, pink neon, cyan awning. Light is « l'intérieur »:
+ * the turquoise wall of the shop, black ceiling, pink and white. Never pastel.
+ *
+ * WHERE THE BRAND PINK GOES. #F578B0 is 7.35:1 on the night ground and 2.56:1
+ * on white, 1.43:1 on the turquoise wall. So: in night mode it is --primary and
+ * --primary-ink; in light mode the engine tokens carry a deep fuchsia (#B3115F
+ * fill, #8A0B4C ink) and the real pink is used in CSS (--tc-pink) only as a FILL
+ * under ink text (7.35:1) or as a glow. A word in pink on white uses
+ * --tc-pink-deep (#D41F7C, 4.90:1), never --tc-pink.
+ *
+ * DECOR TOKENS (stable names, used by every sheet in site/pages/ and by the
+ * components in site/components/; ART_DIRECTION.md §« Jetons et composants à
+ * réutiliser » documents each one):
+ *   raw colours   --tc-night --tc-night-2 --tc-night-3 --tc-white --tc-ink
+ *                 --tc-pink --tc-pink-deep --tc-pink-soft --tc-magenta
+ *                 --tc-cyan --tc-blue-soft --tc-violet --tc-violet-deep
+ *                 --tc-peach --tc-kraft --tc-kraft-dark
+ *   by mode       --tc-ground --tc-slab --tc-slab-2 --tc-text --tc-text-2
+ *                 --tc-word (a word in brand colour on --tc-ground/--tc-slab)
+ *                 --tc-line --tc-bar-bg --tc-bar-fg --tc-glow (0..1)
+ *   gradients     --tc-sunset --tc-neon-line --tc-led --tc-scanlines
+ *   type          --tc-font-display --tc-font-text --tc-font-script
+ *   shape         --tc-r-pill --tc-r-slab --tc-r-card --tc-r-field
+ *                 --tc-bar-h --tc-bar-top (header pill height and offset)
+ *   motion        --tc-ease-out --tc-ease-snap --tc-ease-io --tc-ease-neon
+ *                 --tc-dur-1 (140ms) --tc-dur-2 (280ms) --tc-dur-3 (600ms)
+ *                 --tc-dur-4 (1200ms)
+ *   neon shadows  --tc-halo-pink --tc-halo-cyan --tc-halo-violet (text-shadow)
+ *                 --tc-box-pink --tc-box-cyan (box-shadow)
+ *
+ * Page styles live in site/pages/*.css and are imported just below. DEV NOTE:
+ * after editing an imported file, toggle the trailing newline of THIS file and
+ * wait ~4 s: the dev CSS pipeline does not rebuild imports otherwise.
+ */
+@import "./pages/base.css";
+@import "./pages/home.css";
+@import "./pages/shop.css";
+@import "./pages/custom.css";
+
+/* ── Light: admin (white) and storefront (« l'intérieur », below) ─────────── */
+:root,
+.storefront-theme {
+  --background: 0 0% 100%;
+  --foreground: 288 13.5% 7.3%;
+  --card: 0 0% 100%;
+  --card-foreground: 288 13.5% 7.3%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 288 13.5% 7.3%;
+  --primary: 331 82.7% 38.4%;
+  --primary-foreground: 0 0% 100%;
+  --primary-ink: 329 85.2% 29.2%;
+  --primary-hover: 329 83.3% 23.5%;
+  --ring: 288 13.5% 7.3%;
+  --secondary: 188 50% 94%;
+  --secondary-foreground: 288 13.5% 7.3%;
+  --muted: 188 50% 94%;
+  --muted-foreground: 189 65% 15.7%;
+  --accent: 325 100% 92%;
+  --accent-foreground: 329 83.5% 26.1%;
+  --accent-solid: 254 61.5% 42.7%;
+  --accent-solid-foreground: 0 0% 100%;
+  --border: 188 30% 80%;
+  --input: 188 53.4% 26.1%;
+  --destructive: 350 85.6% 30%;
+  --destructive-foreground: 0 0% 100%;
+  --success: 150 88.2% 16.7%;
+  --success-foreground: 0 0% 100%;
+  --warning: 33 100% 20.8%;
+  --warning-foreground: 0 0% 100%;
+  --info: 214 85.5% 27.1%;
+  --info-foreground: 0 0% 100%;
+  --radius: 1.25rem;
+
+  /* raw colours (same in both modes) */
+  --tc-night: #141015;
+  --tc-night-2: #1c1917;
+  --tc-night-3: #0b080c;
+  --tc-white: #fff5fa;
+  --tc-ink: #141015;
+  --tc-pink: #f578b0;
+  --tc-pink-deep: #d41f7c;
+  --tc-pink-soft: #ffa8f2;
+  --tc-magenta: #ff2e9a;
+  --tc-cyan: #5dd1e3;
+  --tc-blue-soft: #baeeff;
+  --tc-violet: #aa94ff;
+  --tc-violet-deep: #4a2ab0;
+  --tc-peach: #ffb38a;
+  --tc-kraft: #c9955b;
+  --tc-kraft-dark: #8a5a2b;
+
+  /* type */
+  --tc-font-display: var(--font-poppins), "Arial Narrow", "Roboto Condensed", system-ui, sans-serif;
+  --tc-font-text: var(--font-inter), system-ui, -apple-system, sans-serif;
+  --tc-font-script: var(--font-tc-script), "Brush Script MT", cursive;
+
+  /* shape */
+  --tc-r-pill: 999px;
+  --tc-r-slab: 2rem;
+  --tc-r-card: 1.375rem;
+  --tc-r-field: 0.875rem;
+  --tc-bar-h: 64px;
+  --tc-bar-top: 12px;
+
+  /* motion */
+  --tc-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --tc-ease-snap: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --tc-ease-io: cubic-bezier(0.65, 0, 0.35, 1);
+  --tc-ease-neon: steps(1, end);
+  --tc-dur-1: 140ms;
+  --tc-dur-2: 280ms;
+  --tc-dur-3: 600ms;
+  --tc-dur-4: 1200ms;
+
+  /* gradients */
+  --tc-sunset: linear-gradient(180deg, #ffa8f2 0%, #f578b0 34%, #ff2e9a 62%, #ffb38a 100%);
+  --tc-neon-line: linear-gradient(90deg, #f578b0 0%, #aa94ff 50%, #5dd1e3 100%);
+  /* LED panel mask: an ink grid with diamond holes (public/brand/led.svg), to
+     lay over a colour gradient; tile it at 14px (or 10px on a phone). */
+  --tc-led: url("/brand/led.svg");
+  --tc-scanlines: repeating-linear-gradient(0deg, rgb(0 0 0 / 0.18) 0 1px, transparent 1px 4px);
+}
+
+/* The storefront in light mode IS the turquoise wall (the admin stays white). */
+.storefront-theme {
+  --background: 188 70.5% 62.7%;
+  --muted: 188 72% 80.4%;
+  --secondary: 188 72% 80.4%;
+  --border: 188 57.4% 42.4%;
+
+  --tc-ground: #5dd1e3;
+  --tc-slab: #ffffff;
+  --tc-slab-2: #a9e8f1;
+  --tc-text: #141015;
+  --tc-text-2: #0e3a42;
+  --tc-word: #8a0b4c;
+  --tc-line: rgb(20 16 21 / 0.85);
+  --tc-bar-bg: #141015;
+  --tc-bar-fg: #fff5fa;
+  --tc-glow: 0.45;
+  --tc-halo-pink: 0 0 0.04em #fff, 0 0 0.18em rgb(255 46 154 / 0.45);
+  --tc-halo-cyan: 0 0 0.04em #fff, 0 0 0.18em rgb(93 209 227 / 0.5);
+  --tc-halo-violet: 0 0 0.04em #fff, 0 0 0.18em rgb(170 148 255 / 0.5);
+  --tc-box-pink: 0 0 0 2px #141015, 0 0 18px rgb(255 46 154 / 0.35);
+  --tc-box-cyan: 0 0 0 2px #141015, 0 0 18px rgb(93 209 227 / 0.4);
+}
+
+/* ── Night (default) ─────────────────────────────────────────────────────── */
+.dark,
+.dark .storefront-theme {
+  --background: 288 13.5% 7.3%;
+  --foreground: 330 100% 98%;
+  --card: 24 9.8% 10%;
+  --card-foreground: 330 100% 98%;
+  --popover: 24 9.8% 10%;
+  --popover-foreground: 330 100% 98%;
+  --primary: 333 86.2% 71.6%;
+  --primary-foreground: 24 9.8% 10%;
+  --primary-ink: 333 87.8% 74.3%;
+  --primary-hover: 309 100% 82.9%;
+  --ring: 188 70.5% 62.7%;
+  --secondary: 300 9.9% 13.9%;
+  --secondary-foreground: 330 100% 98%;
+  --muted: 312 10.6% 9.2%;
+  --muted-foreground: 318 10.7% 76.3%;
+  --accent: 287 38% 13.9%;
+  --accent-foreground: 309 100% 82.9%;
+  --accent-solid: 252 100% 79%;
+  --accent-solid-foreground: 288 13.5% 7.3%;
+  --border: 311 10.5% 20.6%;
+  --input: 316 6.2% 52.7%;
+  --destructive: 353 100% 74.1%;
+  --destructive-foreground: 288 13.5% 7.3%;
+  --success: 152 69.7% 63.7%;
+  --success-foreground: 288 13.5% 7.3%;
+  --warning: 38 100% 71%;
+  --warning-foreground: 288 13.5% 7.3%;
+  --info: 204 100% 78%;
+  --info-foreground: 288 13.5% 7.3%;
+
+  --tc-ground: #141015;
+  --tc-slab: #1c1917;
+  --tc-slab-2: #272027;
+  --tc-text: #fff5fa;
+  --tc-text-2: #c9bcc5;
+  --tc-word: #f784b8;
+  --tc-line: rgb(255 245 250 / 0.14);
+  --tc-bar-bg: #5dd1e3;
+  --tc-bar-fg: #141015;
+  --tc-glow: 1;
+  --tc-halo-pink: 0 0 0.02em #fff, 0 0 0.12em #ff2e9a, 0 0 0.45em rgb(255 46 154 / 0.7), 0 0 1.1em rgb(245 120 176 / 0.45);
+  --tc-halo-cyan: 0 0 0.02em #fff, 0 0 0.12em #5dd1e3, 0 0 0.45em rgb(93 209 227 / 0.7), 0 0 1.1em rgb(93 209 227 / 0.4);
+  --tc-halo-violet: 0 0 0.02em #fff, 0 0 0.12em #aa94ff, 0 0 0.45em rgb(170 148 255 / 0.7), 0 0 1.1em rgb(170 148 255 / 0.4);
+  --tc-box-pink: 0 0 0 1px rgb(245 120 176 / 0.9), 0 0 14px rgb(255 46 154 / 0.55), 0 0 38px rgb(255 46 154 / 0.25);
+  --tc-box-cyan: 0 0 0 1px rgb(93 209 227 / 0.9), 0 0 14px rgb(93 209 227 / 0.55), 0 0 38px rgb(93 209 227 / 0.25);
+}
+
+/* Admin sidebar follows the palette (not on .storefront-theme: no sidebar on the shop). */
+:root {
+  --sidebar: hsl(0 0% 100%);
+  --sidebar-foreground: hsl(288 13.5% 7.3%);
+  --sidebar-primary: hsl(331 82.7% 38.4%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(325 100% 92%);
+  --sidebar-accent-foreground: hsl(329 83.5% 26.1%);
+  --sidebar-border: hsl(188 30% 80%);
+  --sidebar-ring: hsl(288 13.5% 7.3%);
+}
+
+.dark {
+  --sidebar: hsl(24 9.8% 10%);
+  --sidebar-foreground: hsl(330 100% 98%);
+  --sidebar-primary: hsl(333 86.2% 71.6%);
+  --sidebar-primary-foreground: hsl(24 9.8% 10%);
+  --sidebar-accent: hsl(287 38% 13.9%);
+  --sidebar-accent-foreground: hsl(309 100% 82.9%);
+  --sidebar-border: hsl(311 10.5% 20.6%);
+  --sidebar-ring: hsl(188 70.5% 62.7%);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

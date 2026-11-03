@@ -1,0 +1,7 @@
+# Demo deploy: never upload work files, AI sources or local backends
+.work
+site/source
+.convex
+.convex-build
+.env*
+!.env.example

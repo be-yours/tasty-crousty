@@ -1,0 +1,1187 @@
+/*
+ * BASE · Tasty Crousty « Vice City Crousty » · CLIENT ZONE
+ * The common look over the engine's shared components: ground, type, header
+ * pill, mobile menu, footer, buttons, fields, cards, closed banner, focus,
+ * scrollbar, selection, and the reusable pieces every other sheet may use
+ * (.tc-caption, .tc-ribbon, .tc-neon, .tc-script, .tc-display, .tc-sun,
+ * .tc-floor, .tc-led, .tc-kraft, .tc-slab, .tc-reveal, .tc-flicker-on).
+ * Contract and token list: site/ART_DIRECTION.md. Tokens: site/theme.css.
+ *
+ * EVERY rule is confined to `.storefront-theme` (the dashboard must not move).
+ * Two named exceptions: `html:has(.storefront-theme)` (scrollbar colours of
+ * the root scroller, which only exist on a storefront page) and the portalled
+ * sheet/dialog, which carry `.storefront-theme` on themselves.
+ *
+ * Engine markup this sheet reads (no markup can be added to it):
+ *   .storefront-theme > div.fixed.top-0.h-10           closed banner (store-closed-banner.tsx)
+ *   .storefront-theme > header.fixed > div.storefront-nav
+ *       > a.storefront-nav-brand (text, or <img> when the CMS has a logo)
+ *       > nav.storefront-nav-links > a (+ span = active underline)
+ *       > div.storefront-nav-actions > button.storefront-theme-toggle, cart button, user link
+ *       > div.lg:hidden > cart button, burger button
+ *   .storefront-theme > div.fixed.inset-0.z-40.bg-primary.lg:hidden   mobile menu
+ *   .storefront-theme > footer.storefront-footer > div > .storefront-footer-cols, .storefront-footer-note
+ *
+ * DEV NOTE: after editing this file, toggle the trailing newline of
+ * site/theme.css and wait ~4 s.
+ */
+
+/* ═══════════════════════════ 1. Ground and type ═══════════════════════════ */
+
+.storefront-theme {
+  font-family: var(--tc-font-text);
+  font-synthesis: none;
+  background-color: var(--tc-ground);
+  color: var(--tc-text);
+}
+
+/* Night: a violet haze at the top of the sky, pink on the right, like the sign
+   lighting the street. Fixed to the viewport, so it never tiles. */
+.dark .storefront-theme {
+  background-image:
+    radial-gradient(90% 55% at 50% -12%, rgb(170 148 255 / 0.16), transparent 62%),
+    radial-gradient(55% 40% at 104% 8%, rgb(245 120 176 / 0.12), transparent 64%);
+  background-attachment: fixed;
+}
+
+.storefront-theme :is(h1, h2, h3, h4) {
+  font-family: var(--tc-font-display);
+  font-weight: 900;
+  line-height: 0.94;
+  letter-spacing: 0.004em;
+  text-wrap: balance;
+}
+
+.storefront-theme :is(h1, h2) {
+  font-weight: 950 !important;
+}
+
+/* The Vice City slant: page titles lean, section titles stand. */
+.storefront-theme main h1 {
+  font-style: italic;
+}
+
+/* Coloured words (the engine's parseColoredText spans).
+   Night: pink neon tube (the word stays #F578B0, 7.35:1 on the ground).
+   Light: a TikTok caption pill, ink on brand pink (7.35:1). */
+.storefront-theme :is(h1, h2, h3) > span:is(.italic, .not-italic) {
+  color: var(--tc-pink) !important;
+  text-shadow: var(--tc-halo-pink);
+  font-style: inherit !important;
+}
+
+.storefront-theme:not(.dark *) :is(h1, h2, h3) > span:is(.italic, .not-italic) {
+  color: var(--tc-ink) !important;
+  text-shadow: none;
+  background: var(--tc-pink);
+  padding: 0.02em 0.18em 0.04em;
+  border-radius: 0.18em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.storefront-theme ::selection {
+  background: var(--tc-pink);
+  color: var(--tc-ink);
+  text-shadow: none;
+}
+
+/* Scrollbar of the root scroller, only on a storefront page. */
+html:has(.storefront-theme) {
+  scrollbar-color: var(--tc-pink) var(--tc-night-3);
+}
+
+.storefront-theme * {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--tc-pink) 70%, transparent) transparent;
+}
+
+/* ═══════════════════════════ 2. Focus ═══════════════════════════ */
+/* Night: cyan tube (10.49:1 on the ground). Light: ink ring + pink halo. */
+.storefront-theme :is(a, button, input, select, textarea, summary, [role="button"], [role="tab"], [tabindex]):focus-visible {
+  outline: 3px solid hsl(var(--ring));
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--tc-pink) 35%, transparent);
+}
+
+/* ═══════════════════════════ 3. Closed banner ═══════════════════════════ */
+/* The pink LED strip over the bar: ink text on brand pink (7.35:1). */
+.storefront-theme > div.fixed.top-0.h-10 {
+  background-color: var(--tc-pink);
+  background-image: radial-gradient(circle, rgb(255 255 255 / 0.35) 0 1.2px, transparent 1.6px);
+  background-size: 7px 7px;
+  border-bottom: 0;
+  color: var(--tc-ink);
+}
+
+.storefront-theme > div.fixed.top-0.h-10 :is(div, span, svg, p) {
+  color: var(--tc-ink) !important;
+}
+
+/* ═══════════════════════════ 4. Header: the floating pill ═══════════════════════════ */
+/* One row. Night: cyan pill (the awning), ink text 10.49:1. Light: ink pill
+   (the black ceiling) on the turquoise wall, white text 18.84:1. The logotype
+   sits on the axis; the rooms split around it from 1024 px. */
+
+.storefront-theme > header {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  padding: var(--tc-bar-top) 10px 0;
+  pointer-events: none;
+}
+
+.storefront-theme > header .storefront-nav {
+  pointer-events: auto;
+  position: relative;
+  max-width: 78rem;
+  height: var(--tc-bar-h);
+  margin-inline: auto;
+  padding: 0 10px;
+  gap: 6px;
+  border-radius: var(--tc-r-pill);
+  background: var(--tc-bar-bg);
+  color: var(--tc-bar-fg);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.45),
+    inset 0 -2px 0 rgb(0 0 0 / 0.12),
+    0 0 0 2px var(--tc-ink),
+    0 14px 34px -16px rgb(0 0 0 / 0.75),
+    0 0 26px rgb(93 209 227 / calc(0.32 * var(--tc-glow)));
+  transition: box-shadow var(--tc-dur-2) var(--tc-ease-out), translate var(--tc-dur-3) var(--tc-ease-out);
+}
+
+.storefront-theme:not(.dark *) > header .storefront-nav {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.12),
+    0 0 0 2px rgb(245 120 176 / 0.9),
+    0 0 22px rgb(255 46 154 / 0.35),
+    0 16px 30px -18px rgb(14 58 66 / 0.8);
+}
+
+@media (min-width: 768px) {
+  .storefront-theme > header {
+    padding-inline: 20px;
+  }
+
+  .storefront-theme > header .storefront-nav {
+    padding-inline: 12px;
+  }
+}
+
+/* The logotype, on the axis, out of the flow. No tagline beside it.
+   Without a CMS logo the engine prints the name as text: it stays the link's
+   accessible name and the drawn logotype is painted behind it. */
+.storefront-theme > header .storefront-nav-brand {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  z-index: 2;
+  display: block;
+  width: 140px;
+  height: 50px;
+  font-size: 0 !important;
+  line-height: 0;
+  color: transparent !important;
+  background: url("/brand/logo.svg") center / contain no-repeat;
+  transition: scale var(--tc-dur-2) var(--tc-ease-snap), filter var(--tc-dur-2) ease;
+}
+
+.storefront-theme > header .storefront-nav-brand:has(img) {
+  background: none;
+  width: auto;
+}
+
+.storefront-theme > header .storefront-nav-brand img {
+  height: 50px;
+  width: auto;
+  max-width: 170px;
+}
+
+@media (min-width: 1280px) {
+  .storefront-theme > header .storefront-nav-brand {
+    width: 162px;
+    height: 58px;
+  }
+}
+
+@media (hover: hover) {
+  .storefront-theme > header .storefront-nav-brand:hover {
+    scale: 1.06;
+    filter: drop-shadow(0 0 10px rgb(255 46 154 / 0.55));
+  }
+}
+
+/* Round controls of the bar: no border, no frame. */
+.storefront-theme > header .storefront-nav :is(button, a[data-slot="button"]) {
+  height: 44px;
+  min-width: 44px;
+  border: 0 !important;
+  border-radius: var(--tc-r-pill);
+  background: color-mix(in srgb, var(--tc-bar-fg) 11%, transparent);
+  box-shadow: none;
+  color: var(--tc-bar-fg) !important;
+  transition:
+    background-color var(--tc-dur-1) ease,
+    color var(--tc-dur-1) ease,
+    scale var(--tc-dur-2) var(--tc-ease-snap),
+    box-shadow var(--tc-dur-2) ease;
+}
+
+.storefront-theme > header .storefront-nav button {
+  width: 44px;
+  padding: 0;
+}
+
+.storefront-theme > header .storefront-nav :is(button, a[data-slot="button"]) svg {
+  width: 19px;
+  height: 19px;
+}
+
+.storefront-theme > header .storefront-nav :is(button, a[data-slot="button"]):hover {
+  background: var(--tc-white);
+  color: var(--tc-ink) !important;
+  scale: 1.06;
+}
+
+/* The basket: the bar's pink button (ink icon on brand pink, 7.35:1). */
+.storefront-theme > header .storefront-nav button:has(> svg.lucide-shopping-bag) {
+  background: var(--tc-pink);
+  color: var(--tc-ink) !important;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.5), 0 0 0 2px rgb(20 16 21 / 0.9);
+}
+
+.storefront-theme > header .storefront-nav button:has(> svg.lucide-shopping-bag):hover {
+  background: var(--tc-pink-soft);
+  color: var(--tc-ink) !important;
+  box-shadow: var(--tc-box-pink);
+}
+
+/* Its count: an ink tag (white on ink, 18.84:1). */
+.storefront-theme > header .storefront-nav button > span.absolute {
+  top: -3px;
+  right: -5px;
+  min-width: 20px;
+  width: auto;
+  height: 20px;
+  padding: 0 5px;
+  background: var(--tc-ink);
+  color: var(--tc-white);
+  font-family: var(--tc-font-display);
+  font-size: 12px;
+  font-weight: 800;
+  box-shadow: 0 0 0 2px var(--tc-pink);
+}
+
+/* The account link: white pill, deep pink text (4.90:1). */
+.storefront-theme > header .storefront-nav-actions a[data-slot="button"] {
+  min-width: 0;
+  padding: 0 18px;
+  background: #fff;
+  color: var(--tc-pink-deep) !important;
+  font-family: var(--tc-font-display);
+  font-size: 1.0625rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.storefront-theme > header .storefront-nav-actions a[data-slot="button"]:hover {
+  background: var(--tc-ink);
+  color: var(--tc-white) !important;
+}
+
+.storefront-theme > header .storefront-nav-actions a[data-slot="button"] svg {
+  width: 16px;
+  height: 16px;
+}
+
+.storefront-theme > header .storefront-nav [data-slot="avatar"] {
+  border: 0;
+}
+
+/* Phone and tablet: burger on the left, logotype on the axis, basket on the right. */
+.storefront-theme > header .storefront-nav > div.lg\:hidden {
+  display: contents;
+}
+
+.storefront-theme > header .storefront-nav > div.lg\:hidden > button:last-child {
+  order: -1;
+  margin-right: auto;
+}
+
+/* From 1024 px: the four rooms split around the logotype (Carte, À propos |
+   logo | Blog, Contact). Home is the logotype itself. The colour-scheme switch
+   balances the bar on the left, the basket and the account close it on the right. */
+@media (min-width: 1024px) {
+  .storefront-theme > header .storefront-nav > div.lg\:hidden {
+    display: none;
+  }
+
+  /* Centred without a transform: a transformed box would trap fixed children. */
+  .storefront-theme > header .storefront-nav-links {
+    position: absolute;
+    inset: 0;
+    margin-inline: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr 196px 1fr 1fr;
+    align-items: center;
+    column-gap: 4px;
+    width: min(38rem, 100% - 400px);
+    pointer-events: none;
+  }
+
+  .storefront-theme > header .storefront-nav-links > a {
+    position: relative;
+    display: none;
+    padding: 8px 12px;
+    border-radius: var(--tc-r-pill);
+    color: var(--tc-bar-fg) !important;
+    font-family: var(--tc-font-display);
+    font-size: 1.125rem;
+    font-weight: 850;
+    line-height: 1;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    pointer-events: auto;
+    transition: background-color var(--tc-dur-1) ease, color var(--tc-dur-1) ease;
+  }
+
+  .storefront-theme > header .storefront-nav-links > a[href="/menu"] {
+    display: block;
+    grid-column: 1;
+    justify-self: center;
+  }
+
+  .storefront-theme > header .storefront-nav-links > a[href="/about"] {
+    display: block;
+    grid-column: 2;
+    justify-self: center;
+  }
+
+  .storefront-theme > header .storefront-nav-links > a[href="/blog"] {
+    display: block;
+    grid-column: 4;
+    justify-self: center;
+  }
+
+  .storefront-theme > header .storefront-nav-links > a[href="/contact"] {
+    display: block;
+    grid-column: 5;
+    justify-self: center;
+  }
+
+  /* Hover: a pink tube drawn from the centre under the word. */
+  .storefront-theme > header .storefront-nav-links > a::after {
+    content: "";
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 2px;
+    height: 3px;
+    border-radius: 3px;
+    background: var(--tc-pink);
+    box-shadow: 0 0 8px rgb(255 46 154 / 0.8);
+    transform: scaleX(0);
+    transition: transform var(--tc-dur-2) var(--tc-ease-out);
+  }
+
+  .storefront-theme > header .storefront-nav-links > a:hover::after {
+    transform: scaleX(1);
+  }
+
+  /* Active room: an ink tag on the cyan pill (white 18.84:1), a pink tag on the ink pill (ink 7.35:1). */
+  .storefront-theme > header .storefront-nav-links > a:has(> span) {
+    background: var(--tc-ink);
+    color: var(--tc-white) !important;
+  }
+
+  .storefront-theme:not(.dark *) > header .storefront-nav-links > a:has(> span) {
+    background: var(--tc-pink);
+    color: var(--tc-ink) !important;
+  }
+
+  .storefront-theme > header .storefront-nav-links > a:has(> span)::after {
+    display: none;
+  }
+
+  .storefront-theme > header .storefront-nav-links > a > span {
+    display: none;
+  }
+
+  .storefront-theme > header .storefront-nav-actions {
+    display: contents;
+  }
+
+  .storefront-theme > header .storefront-nav-actions > .storefront-theme-toggle {
+    order: -1;
+    margin-right: auto;
+  }
+
+  .storefront-theme > header .storefront-nav-actions > :not(.storefront-theme-toggle) {
+    position: relative;
+    z-index: 3;
+  }
+}
+
+/* 1024-1279 px: a narrower room grid so Contact never touches the basket. */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .storefront-theme > header .storefront-nav-links {
+    grid-template-columns: 1fr 1fr 168px 1fr 1fr;
+    width: min(38rem, 100% - 470px);
+  }
+
+  .storefront-theme > header .storefront-nav-links > a {
+    padding-inline: 8px;
+    font-size: 1.0625rem;
+    letter-spacing: 0.04em;
+  }
+}
+
+/* ═══════════════════════════ 5. Mobile menu: the night street ═══════════════════════════ */
+/* Full-screen night, a sunset with three palms over a pink grid floor, the rooms
+   in huge leaning capitals (white 18.84:1, active pink 7.35:1). */
+.storefront-theme > div.fixed.inset-0.bg-primary {
+  --primary-foreground: 330 100% 98%;
+  --primary-hover: 288 13.5% 7.3%;
+  background-color: var(--tc-night);
+  background-image:
+    url("/brand/floor.svg"),
+    url("/brand/sun.svg"),
+    linear-gradient(180deg, var(--tc-night) 0%, #2a1236 70%, #3b1240 100%);
+  background-repeat: no-repeat;
+  background-position:
+    50% 100%,
+    50% calc(100% - min(26svh, 190px) - 6px),
+    0 0;
+  background-size:
+    100% min(26svh, 190px),
+    min(54vw, 230px) auto,
+    100% 100%;
+  color: var(--tc-white);
+  padding-top: var(--tc-bar-top);
+}
+
+.storefront-theme > div.fixed.inset-0.bg-primary > div:first-child > span {
+  display: block;
+  width: 140px;
+  height: 50px;
+  font-size: 0 !important;
+  color: transparent !important;
+  background: url("/brand/logo.svg") left center / contain no-repeat;
+}
+
+.storefront-theme > div.fixed.inset-0.bg-primary > div:first-child > span:has(img) {
+  background: none;
+}
+
+.storefront-theme > div.fixed.inset-0.bg-primary > div:first-child > span img {
+  filter: none;
+  height: 46px;
+}
+
+.storefront-theme > div.fixed.inset-0.bg-primary button {
+  width: 48px;
+  height: 48px;
+  border: 0 !important;
+  background: var(--tc-pink) !important;
+  color: var(--tc-ink) !important;
+}
+
+.storefront-theme > div.fixed.inset-0.bg-primary nav {
+  justify-content: flex-start;
+  padding-top: 6svh;
+  gap: 0.25rem;
+}
+
+.storefront-theme > div.fixed.inset-0.bg-primary nav a {
+  display: inline-block;
+  font-family: var(--tc-font-display);
+  font-style: italic;
+  font-weight: 950;
+  font-size: clamp(2.6rem, 13vw, 4.25rem);
+  line-height: 0.98;
+  letter-spacing: 0.01em;
+  color: var(--tc-white) !important;
+  text-decoration: none !important;
+  transition: color var(--tc-dur-1) ease, text-shadow var(--tc-dur-2) ease, translate var(--tc-dur-2) var(--tc-ease-snap);
+}
+
+.storefront-theme > div.fixed.inset-0.bg-primary nav a[class*="underline"]:not([class*="hover:underline"]) {
+  color: var(--tc-pink) !important;
+  text-shadow: var(--tc-halo-pink);
+}
+
+.storefront-theme > div.fixed.inset-0.bg-primary nav a:is(:hover, :focus-visible) {
+  color: var(--tc-cyan) !important;
+  text-shadow: var(--tc-halo-cyan);
+  translate: 6px 0;
+}
+
+.storefront-theme > div.fixed.inset-0.bg-primary > div:last-child :is(button, a) {
+  background: rgb(255 245 250 / 0.1) !important;
+  color: var(--tc-white) !important;
+}
+
+/* ═══════════════════════════ 6. Footer: the street at closing time ═══════════════════════════ */
+/* Deepest night in both modes (the black facade), a neon tube along the top
+   edge, the logotype above the shop's name. White 18.68:1, pink 7.77:1,
+   discreet grey 9.28:1 on --tc-night-3. */
+.storefront-theme .storefront-footer {
+  --primary: 333 86.2% 71.6%;
+  --primary-foreground: 330 100% 98%;
+  --primary-hover: 288 20% 4%;
+  --foreground: 330 100% 98%;
+  --muted-foreground: 318 10.7% 76.3%;
+  position: relative;
+  margin-top: 6rem;
+  padding-top: 6rem;
+  background: var(--tc-night-3) !important;
+  color: var(--tc-white);
+}
+
+.storefront-theme .storefront-footer::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 3px;
+  background: var(--tc-neon-line);
+  box-shadow: 0 0 10px rgb(255 46 154 / 0.7), 0 0 28px rgb(93 209 227 / 0.35);
+}
+
+.storefront-theme .storefront-footer .storefront-footer-brand {
+  font-family: var(--tc-font-display);
+  font-size: 1.75rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--tc-white);
+}
+
+.storefront-theme .storefront-footer .storefront-footer-brand::before {
+  content: "";
+  display: block;
+  width: 210px;
+  height: 78px;
+  margin-bottom: 1.25rem;
+  background: url("/brand/logo.svg") left center / contain no-repeat;
+}
+
+.storefront-theme .storefront-footer h3 {
+  font-family: var(--tc-font-display);
+  font-size: 1.375rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  color: var(--tc-pink) !important;
+  border-color: rgb(255 245 250 / 0.14) !important;
+}
+
+.storefront-theme .storefront-footer :is(p, span) {
+  color: #e9dde4;
+}
+
+.storefront-theme .storefront-footer svg {
+  color: var(--tc-cyan) !important;
+}
+
+.storefront-theme .storefront-footer a {
+  color: var(--tc-white) !important;
+  text-decoration-thickness: 2px;
+  transition: color var(--tc-dur-1) ease, text-shadow var(--tc-dur-2) ease;
+}
+
+.storefront-theme .storefront-footer a:hover {
+  color: var(--tc-pink) !important;
+  text-shadow: var(--tc-halo-pink);
+  text-decoration-color: currentColor;
+}
+
+/* Franchise: the one link to it on the whole site. Present, quiet: small
+   grey capitals (9.28:1), no colour, no pill. */
+.storefront-theme .storefront-footer a[href="/franchise"] {
+  color: #b9aeb5 !important;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.storefront-theme .storefront-footer a[href="/franchise"]:hover {
+  color: var(--tc-white) !important;
+  text-shadow: none;
+}
+
+.storefront-theme .storefront-footer input {
+  height: 3.25rem;
+  border-radius: var(--tc-r-pill);
+  border: 2px solid #8e7f8a !important;
+  background: var(--tc-night-2) !important;
+  color: var(--tc-white) !important;
+}
+
+.storefront-theme .storefront-footer input::placeholder {
+  color: #b9aeb5 !important;
+}
+
+.storefront-theme .storefront-footer form button {
+  border-radius: var(--tc-r-pill) !important;
+  height: 2.5rem !important;
+}
+
+.storefront-theme .storefront-footer .storefront-footer-note {
+  border-color: rgb(255 245 250 / 0.12) !important;
+}
+
+.storefront-theme .storefront-footer .storefront-footer-note :is(p, a) {
+  color: #b9aeb5 !important;
+}
+
+.storefront-theme .storefront-footer .storefront-footer-note a:hover {
+  color: var(--tc-white) !important;
+}
+
+/* ═══════════════════════════ 7. Buttons ═══════════════════════════ */
+/* Default: pink pill, ink text (7.35:1). Hover: the tube lights up.
+   Outline/secondary: white pill, deep pink text (4.90:1).
+   Light mode adds a 2 px ink edge so a pink pill stands on the turquoise wall. */
+.storefront-theme [data-slot="button"][data-variant="default"],
+.storefront-theme button.storefront-menu-add,
+.storefront-theme .tc-btn {
+  background: var(--tc-pink) !important;
+  color: var(--tc-ink) !important;
+  border: 0;
+  border-radius: var(--tc-r-pill);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.55), inset 0 -2px 0 rgb(0 0 0 / 0.14);
+  font-family: var(--tc-font-display);
+  font-weight: 850;
+  font-size: 1.0625rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition:
+    translate var(--tc-dur-2) var(--tc-ease-snap),
+    box-shadow var(--tc-dur-2) ease,
+    background-color var(--tc-dur-1) ease;
+}
+
+.storefront-theme [data-slot="button"][data-variant="default"]:not(:disabled):hover,
+.storefront-theme button.storefront-menu-add:not(:disabled):hover,
+.storefront-theme .tc-btn:hover {
+  background: var(--tc-pink-soft) !important;
+  color: var(--tc-ink) !important;
+  translate: 0 -2px;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.6), var(--tc-box-pink);
+}
+
+.storefront-theme [data-slot="button"][data-variant="default"]:not(:disabled):active,
+.storefront-theme button.storefront-menu-add:not(:disabled):active,
+.storefront-theme .tc-btn:active {
+  translate: 0 1px;
+}
+
+.storefront-theme:not(.dark *) :is([data-slot="button"][data-variant="default"], button.storefront-menu-add, .tc-btn) {
+  box-shadow: 0 0 0 2px var(--tc-ink), inset 0 1px 0 rgb(255 255 255 / 0.55);
+}
+
+.storefront-theme [data-slot="button"]:is([data-variant="outline"], [data-variant="secondary"]),
+.storefront-theme .tc-btn--white {
+  background: #fff !important;
+  color: var(--tc-pink-deep) !important;
+  border: 0 !important;
+  border-radius: var(--tc-r-pill);
+  box-shadow: inset 0 -2px 0 rgb(0 0 0 / 0.08);
+  font-family: var(--tc-font-display);
+  font-weight: 850;
+  font-size: 1.0625rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: translate var(--tc-dur-2) var(--tc-ease-snap), box-shadow var(--tc-dur-2) ease;
+}
+
+.storefront-theme [data-slot="button"]:is([data-variant="outline"], [data-variant="secondary"]):not(:disabled):hover,
+.storefront-theme .tc-btn--white:hover {
+  background: #fff !important;
+  color: var(--tc-pink-deep) !important;
+  translate: 0 -2px;
+  box-shadow: var(--tc-box-cyan);
+}
+
+.storefront-theme:not(.dark *) :is([data-slot="button"]:is([data-variant="outline"], [data-variant="secondary"]), .tc-btn--white) {
+  box-shadow: 0 0 0 2px var(--tc-ink);
+}
+
+.storefront-theme [data-slot="button"][data-variant="ghost"] {
+  border-radius: var(--tc-r-pill);
+}
+
+.storefront-theme [data-slot="button"][data-variant="ghost"]:hover {
+  background: color-mix(in srgb, var(--tc-pink) 18%, transparent);
+  color: var(--tc-text);
+}
+
+.storefront-theme [data-slot="button"]:disabled {
+  opacity: 0.55;
+}
+
+/* A round arrow button, cyan (the official site's small arrow disc). */
+.storefront-theme .tc-btn--round {
+  display: inline-grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--tc-cyan) !important;
+  color: var(--tc-ink) !important;
+}
+
+/* ═══════════════════════════ 8. Fields ═══════════════════════════ */
+.storefront-theme :is(input, textarea, select):not([type="checkbox"], [type="radio"], [type="range"], [type="file"]) {
+  border-width: 2px;
+  border-color: hsl(var(--input));
+  border-radius: var(--tc-r-field);
+  transition: border-color var(--tc-dur-1) ease, box-shadow var(--tc-dur-2) ease;
+}
+
+.storefront-theme :is(input, textarea, select):not([type="checkbox"], [type="radio"], [type="range"], [type="file"]):focus-visible {
+  border-color: hsl(var(--ring));
+  outline: 0;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--tc-cyan) 40%, transparent), 0 0 18px rgb(93 209 227 / calc(0.4 * var(--tc-glow)));
+}
+
+.storefront-theme :is(input[type="checkbox"], input[type="radio"]) {
+  accent-color: var(--tc-pink-deep);
+}
+
+.dark .storefront-theme :is(input[type="checkbox"], input[type="radio"]) {
+  accent-color: var(--tc-pink);
+}
+
+.storefront-theme label {
+  font-weight: 700;
+}
+
+/* ═══════════════════════════ 9. Cards and slabs ═══════════════════════════ */
+/* No frame: a slab on the ground. Night: warm black slab with a 1 px light
+   edge on top. Light: white slab on the turquoise wall with a soft teal shadow. */
+.storefront-theme [data-slot="card"],
+.storefront-theme .tc-slab {
+  border: 0;
+  border-radius: var(--tc-r-card);
+  background-color: var(--tc-slab);
+  color: var(--tc-text);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.07), 0 24px 40px -28px rgb(0 0 0 / 0.9);
+}
+
+.storefront-theme:not(.dark *) :is([data-slot="card"], .tc-slab) {
+  box-shadow: 0 22px 40px -26px rgb(14 58 66 / 0.75);
+}
+
+.storefront-theme .tc-slab {
+  border-radius: var(--tc-r-slab);
+  padding: clamp(1.25rem, 3vw, 2.5rem);
+}
+
+/* ═══════════════════════════ 10. Portals: cart sheet and dialogs ═══════════════════════════ */
+.storefront-theme[data-slot="sheet-content"] {
+  background-color: var(--tc-slab);
+  color: var(--tc-text);
+  border: 0 !important;
+  box-shadow: -3px 0 0 var(--tc-pink), -10px 0 34px rgb(255 46 154 / calc(0.35 * var(--tc-glow)));
+}
+
+.storefront-theme:is([data-slot="sheet-content"], [data-slot="dialog-content"]) :is(h2, [data-slot="sheet-title"], [data-slot="dialog-title"]) {
+  font-family: var(--tc-font-display);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.storefront-theme[data-slot="dialog-content"] {
+  border: 0;
+  border-radius: var(--tc-r-slab);
+  background-color: var(--tc-slab);
+  box-shadow: 0 0 0 2px var(--tc-pink), 0 30px 60px -20px rgb(0 0 0 / 0.8);
+}
+
+/* ═══════════════════════════ 11. Reusable pieces ═══════════════════════════ */
+
+/* .tc-display: poster capitals. .tc-display--lean: the Vice City slant. */
+.storefront-theme .tc-display {
+  font-family: var(--tc-font-display);
+  font-weight: 950;
+  line-height: 0.9;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+}
+
+.storefront-theme .tc-display--lean {
+  font-style: italic;
+}
+
+/* .tc-script: the sign's script, for one or two words, never a paragraph. */
+.storefront-theme .tc-script {
+  font-family: var(--tc-font-script);
+  font-weight: 400;
+  font-style: normal;
+  text-transform: none;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+/* .tc-neon: a word written in a neon tube. Colour stays the tube colour
+   (pink 7.35:1 / cyan 10.49:1 / violet 7.53:1 on the night ground). In light
+   mode the tube is ink with a soft glow (the halo tokens shrink). Use on
+   night/ink grounds or let the light-mode fallback apply. */
+.storefront-theme .tc-neon {
+  color: var(--tc-pink);
+  text-shadow: var(--tc-halo-pink);
+}
+
+.storefront-theme .tc-neon--cyan {
+  color: var(--tc-cyan);
+  text-shadow: var(--tc-halo-cyan);
+}
+
+.storefront-theme .tc-neon--violet {
+  color: var(--tc-violet);
+  text-shadow: var(--tc-halo-violet);
+}
+
+.storefront-theme .tc-neon--white {
+  color: #fff;
+  text-shadow: var(--tc-halo-pink);
+}
+
+.storefront-theme:not(.dark *) :is(.tc-neon, .tc-neon--cyan, .tc-neon--violet, .tc-neon--white):not(.tc-on-night *, .tc-on-night) {
+  color: var(--tc-ink);
+}
+
+/* .tc-on-night: an island of night inside a light-mode page (the shopfront,
+   the LED counter). Everything inside keeps its night colours. */
+.storefront-theme .tc-on-night {
+  background-color: var(--tc-night);
+  color: var(--tc-white);
+  --tc-text: #fff5fa;
+  --tc-text-2: #c9bcc5;
+  --tc-word: #f784b8;
+  --tc-slab: #1c1917;
+  --tc-glow: 1;
+  --tc-halo-pink: 0 0 0.02em #fff, 0 0 0.12em #ff2e9a, 0 0 0.45em rgb(255 46 154 / 0.7), 0 0 1.1em rgb(245 120 176 / 0.45);
+  --tc-halo-cyan: 0 0 0.02em #fff, 0 0 0.12em #5dd1e3, 0 0 0.45em rgb(93 209 227 / 0.7), 0 0 1.1em rgb(93 209 227 / 0.4);
+  --tc-halo-violet: 0 0 0.02em #fff, 0 0 0.12em #aa94ff, 0 0 0.45em rgb(170 148 255 / 0.7), 0 0 1.1em rgb(170 148 255 / 0.4);
+}
+
+/* .tc-flicker-on: a tube switching on, once (1.1 s, finite). */
+.storefront-theme .tc-flicker-on {
+  animation: tc-flicker-on var(--tc-dur-4) linear 0.2s both;
+}
+
+@keyframes tc-flicker-on {
+  0% { opacity: 0.12; text-shadow: none; filter: none; }
+  8% { opacity: 1; }
+  11% { opacity: 0.25; text-shadow: none; }
+  19% { opacity: 1; }
+  22% { opacity: 0.5; }
+  34% { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+/* .tc-caption: a TikTok subtitle pill. Default: ink bold on brand pink
+   (7.35:1). --white: white on deep pink (4.90:1, use at 18.66px bold or more).
+   --cyan: ink on cyan (10.49:1). Wraps line by line like the app does. */
+.storefront-theme .tc-caption {
+  display: inline;
+  padding: 0.14em 0.42em 0.18em;
+  border-radius: 0.42em;
+  background: var(--tc-pink);
+  color: var(--tc-ink);
+  font-family: var(--tc-font-text);
+  font-weight: 800;
+  font-style: normal;
+  line-height: 1.55;
+  letter-spacing: 0;
+  text-transform: none;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.storefront-theme .tc-caption--white {
+  background: var(--tc-pink-deep);
+  color: #fff;
+}
+
+.storefront-theme .tc-caption--cyan {
+  background: var(--tc-cyan);
+  color: var(--tc-ink);
+}
+
+.storefront-theme .tc-caption--tilt {
+  display: inline-block;
+  rotate: -2.5deg;
+}
+
+/* A caption that pops in when scrolled into view (finite, see §12). */
+.storefront-theme .tc-caption--pop {
+  display: inline-block;
+}
+
+/* .tc-ribbon: the tilted pink band of capitals crossing the screen
+   (« GÉNÉROSITÉ SANS LIMITES • UN GOÛT AUTHENTIQUE »).
+   Markup (written by a site component, decorative copy is aria-hidden):
+     <div class="tc-ribbon" data-paused="false">
+       <button class="tc-ribbon__toggle" aria-pressed="false">Mettre en pause le bandeau</button>
+       <div class="tc-ribbon__track" aria-hidden="true">
+         <span>GÉNÉROSITÉ SANS LIMITES</span><span>UN GOÛT AUTHENTIQUE</span> …(the list twice)
+       </div>
+       <p class="sr-only">Générosité sans limites. Un goût authentique.</p>
+     </div>
+   White capitals on deep pink (4.90:1, large bold). The track loops slowly
+   (40 s); WCAG 2.2.2: it stops on hover, on focus inside, with the toggle
+   (data-paused="true" or aria-pressed="true"), and never runs under
+   prefers-reduced-motion. --tc-ribbon-tilt sets the angle (default -4deg);
+   --cyan swaps to an ink-on-cyan band. The band is wider than the screen
+   only by its rotation: the parent must use overflow: clip (never hidden on
+   a sticky ancestor). */
+.storefront-theme .tc-ribbon {
+  --tc-ribbon-tilt: -4deg;
+  --tc-ribbon-speed: 40s;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  width: 112%;
+  margin-inline: -6%;
+  padding-block: 0.55rem;
+  background: var(--tc-pink-deep);
+  color: #fff;
+  rotate: var(--tc-ribbon-tilt);
+  overflow: clip;
+  box-shadow: 0 0 0 2px var(--tc-ink), 0 12px 30px -10px rgb(0 0 0 / 0.6);
+}
+
+.storefront-theme .tc-ribbon--cyan {
+  background: var(--tc-cyan);
+  color: var(--tc-ink);
+}
+
+.storefront-theme .tc-ribbon__track {
+  display: flex;
+  flex: none;
+  gap: 2.25rem;
+  padding-left: 2.25rem;
+  white-space: nowrap;
+  font-family: var(--tc-font-display);
+  font-weight: 900;
+  font-style: italic;
+  font-size: clamp(1.375rem, 3.2vw, 2.25rem);
+  line-height: 1;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  animation: tc-ribbon-run var(--tc-ribbon-speed) linear infinite;
+}
+
+.storefront-theme .tc-ribbon__track > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 2.25rem;
+}
+
+/* The separator: a small white sun with palms (no bead strings). */
+.storefront-theme .tc-ribbon__track > span::after {
+  content: "";
+  width: 0.9em;
+  height: 0.9em;
+  flex: none;
+  background: url("/brand/mark.svg") center / contain no-repeat;
+}
+
+.storefront-theme .tc-ribbon:is(:hover, :focus-within, [data-paused="true"]) .tc-ribbon__track,
+.storefront-theme .tc-ribbon:has(.tc-ribbon__toggle[aria-pressed="true"]) .tc-ribbon__track {
+  animation-play-state: paused;
+}
+
+.storefront-theme .tc-ribbon__toggle {
+  position: absolute;
+  right: 8%;
+  top: 50%;
+  translate: 0 -50%;
+  z-index: 2;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 0;
+  background: var(--tc-ink);
+  color: #fff;
+  font-size: 0;
+  opacity: 0;
+  transition: opacity var(--tc-dur-1) ease;
+}
+
+.storefront-theme .tc-ribbon__toggle::before {
+  content: "";
+  display: block;
+  width: 10px;
+  height: 12px;
+  margin: auto;
+  border-inline: 3px solid currentColor;
+}
+
+.storefront-theme .tc-ribbon__toggle[aria-pressed="true"]::before {
+  width: 0;
+  height: 0;
+  border-inline: 0;
+  border-left: 11px solid currentColor;
+  border-block: 7px solid transparent;
+  margin-left: 13px;
+}
+
+.storefront-theme .tc-ribbon:is(:hover, :focus-within) .tc-ribbon__toggle,
+.storefront-theme .tc-ribbon__toggle[aria-pressed="true"] {
+  opacity: 1;
+}
+
+@keyframes tc-ribbon-run {
+  from { translate: 0 0; }
+  to { translate: -50% 0; }
+}
+
+/* .tc-sun: the striped sunset disc with three palms (decor, aria-hidden).
+   Size with width; the image keeps its ratio and is always whole. */
+.storefront-theme .tc-sun {
+  display: block;
+  aspect-ratio: 1;
+  width: min(60vw, 420px);
+  background: url("/brand/sun.svg") center / contain no-repeat;
+  filter: drop-shadow(0 0 40px rgb(255 46 154 / calc(0.45 * var(--tc-glow))));
+}
+
+/* .tc-floor: the synthwave grid floor running to the horizon (static SVG,
+   safe in WebKit; a moving floor is a canvas, see ART_DIRECTION.md). */
+.storefront-theme .tc-floor {
+  display: block;
+  width: 100%;
+  height: min(24svh, 220px);
+  background: url("/brand/floor.svg") center top / 100% 100% no-repeat;
+}
+
+/* .tc-led: the LED counter panel, a grid of diamonds that sweeps
+   pink -> violet -> cyan. Text on it must sit on an ink plate. */
+.storefront-theme .tc-led {
+  position: relative;
+  isolation: isolate;
+  background-color: var(--tc-night);
+  background-image:
+    var(--tc-led),
+    linear-gradient(100deg, #ff2e9a 0%, #aa94ff 30%, #5dd1e3 50%, #aa94ff 70%, #ff2e9a 100%);
+  background-size: 14px 14px, 200% 100%;
+  background-position: 0 0, 0% 0;
+}
+
+.storefront-theme .tc-led--sweep {
+  animation: tc-led-sweep 2.4s var(--tc-ease-io) 0.2s both;
+}
+
+@keyframes tc-led-sweep {
+  from { background-position: 0 0, 100% 0; }
+  to { background-position: 0 0, 0% 0; }
+}
+
+/* .tc-kraft: the paper bag surface (ink text 7.12:1). */
+.storefront-theme .tc-kraft {
+  background-color: var(--tc-kraft);
+  background-image:
+    repeating-linear-gradient(92deg, rgb(255 255 255 / 0.05) 0 2px, transparent 2px 7px),
+    linear-gradient(180deg, rgb(255 255 255 / 0.12), rgb(0 0 0 / 0.08));
+  color: var(--tc-ink);
+}
+
+/* .tc-rule: a thin neon tube as a separator. */
+.storefront-theme .tc-rule {
+  display: block;
+  height: 3px;
+  border: 0;
+  border-radius: 3px;
+  background: var(--tc-neon-line);
+  box-shadow: 0 0 10px rgb(255 46 154 / calc(0.6 * var(--tc-glow)));
+}
+
+/* ═══════════════════════════ 12. Motion grammar ═══════════════════════════ */
+/* The resting state of everything above IS the final composition: these only
+   add an entrance when motion is allowed and the browser has view timelines. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .storefront-theme .tc-reveal {
+      animation: tc-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+
+    .storefront-theme .tc-reveal--tilt {
+      animation: tc-rise-tilt linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+
+    .storefront-theme .tc-caption--pop {
+      animation: tc-pop linear both;
+      animation-timeline: view();
+      animation-range: entry 10% entry 70%;
+    }
+
+    .storefront-theme .tc-ribbon--scroll .tc-ribbon__track {
+      animation: tc-ribbon-run linear both;
+      animation-timeline: view();
+      animation-range: cover 0% cover 100%;
+    }
+  }
+}
+
+@keyframes tc-rise {
+  from { opacity: 0; translate: 0 2.25rem; }
+  to { opacity: 1; translate: 0 0; }
+}
+
+@keyframes tc-rise-tilt {
+  from { opacity: 0; translate: 0 2.5rem; rotate: -3deg; }
+  to { opacity: 1; translate: 0 0; rotate: 0deg; }
+}
+
+@keyframes tc-pop {
+  0% { opacity: 0; scale: 0.6; rotate: -8deg; }
+  70% { opacity: 1; scale: 1.06; rotate: 1deg; }
+  100% { opacity: 1; scale: 1; rotate: -2.5deg; }
+}
+
+/* The basket pops when something is added (class toggled by SiteEffects). */
+.storefront-theme > header button.tc-pop {
+  animation: tc-basket-pop 0.6s var(--tc-ease-snap);
+}
+
+@keyframes tc-basket-pop {
+  0% { scale: 1; }
+  30% { scale: 1.3 0.8; }
+  60% { scale: 0.92 1.15; }
+  100% { scale: 1; }
+}
+
+/* No motion for whoever asked for none: every animation stops on its final
+   frame (they are all written with that frame as the resting style). */
+@media (prefers-reduced-motion: reduce) {
+  .storefront-theme *,
+  .storefront-theme *::before,
+  .storefront-theme *::after {
+    animation: none !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .storefront-theme .tc-ribbon__toggle {
+    display: none;
+  }
+}

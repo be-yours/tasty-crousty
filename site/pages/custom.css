@@ -1,0 +1,3885 @@
+/*
+ * PAGES · Tasty Crousty « Vice City Crousty » · CLIENT ZONE
+ *
+ * Own pages (site/components/pages/*): /restaurant, /commander, /club-crousty,
+ * /franchise. Engine pages restyled here: /about, /blog, /blog/<slug>,
+ * /contact, the three legal pages, the auth screens, /account, the 404.
+ * (Home, menu, cart, checkout: home.css and shop.css, another sheet.)
+ *
+ * Contract: site/ART_DIRECTION.md. Tokens: site/theme.css. Reusable pieces
+ * (.tc-caption, .tc-ribbon, .tc-neon, .tc-led, .tc-kraft…): site/pages/base.css.
+ *
+ * EVERY rule is confined to `.storefront-theme`. The engine pages carry no
+ * page class: each is recognised by a piece of markup only it has (see « Engine
+ * page scopes » below). Nothing here adds markup to the engine.
+ *
+ * Motion: the resting style of every element IS the final composition. Every
+ * entrance, scroll scene and neon switch-on lives in §MOTION, behind
+ * `prefers-reduced-motion: no-preference` (and `@supports (animation-timeline:
+ * view())` for the scroll-driven ones). base.css stops every animation under
+ * `reduce`. Pinned scenes (/commander, /franchise) pin only from 900 px, for a
+ * little more than one screen, under `overflow: clip` (never hidden).
+ *
+ * Local additions (not in base.css): .tc-tbc, .tc-title, .tc-letters,
+ * .tc-btn--big, the night-hero token block shared by .tc-hero and the engine
+ * heroes, and three registered properties for the scroll scenes.
+ *
+ * DEV NOTE: after editing this file, toggle the trailing newline of
+ * site/theme.css and wait ~4 s.
+ */
+
+@property --tc-ry {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: -7deg;
+}
+
+@property --tc-bag-ry {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: -10deg;
+}
+
+@property --tc-tilt-x {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+/* ═══════════════════════════ 1. Scaffolding ═══════════════════════════ */
+
+.storefront-theme .tc-page {
+  overflow-x: clip;
+}
+
+.storefront-theme .tc-wrap {
+  width: min(76rem, 100% - 2.5rem);
+  margin-inline: auto;
+}
+
+.storefront-theme .tc-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.storefront-theme .tc-section {
+  padding-block: clamp(3.5rem, 8vw, 6.5rem);
+}
+
+.storefront-theme .tc-anchor {
+  scroll-margin-top: calc(var(--tc-bar-h) + var(--tc-bar-top) + 1.5rem);
+}
+
+.storefront-theme .tc-title {
+  margin-bottom: clamp(1.75rem, 3.5vw, 2.75rem);
+}
+
+.storefront-theme .tc-title--center {
+  text-align: center;
+}
+
+.storefront-theme .tc-title__kicker {
+  margin-bottom: 0.9rem;
+  font-size: 0.95rem;
+}
+
+.storefront-theme .tc-h2 {
+  font-family: var(--tc-font-display);
+  font-size: clamp(2.75rem, 7.2vw, 5.75rem) !important;
+  line-height: 0.9 !important;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+  color: var(--tc-text);
+  max-width: 16ch;
+}
+
+.storefront-theme .tc-title--center .tc-h2 {
+  margin-inline: auto;
+}
+
+.storefront-theme .tc-h3 {
+  font-family: var(--tc-font-display);
+  font-size: clamp(1.6rem, 2.6vw, 2.1rem);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.storefront-theme .tc-lead {
+  max-width: 38rem;
+  font-size: clamp(1.1rem, 1.6vw, 1.3rem);
+  font-weight: 500;
+  line-height: 1.55;
+  color: var(--tc-text-2);
+}
+
+.storefront-theme .tc-title--center + .tc-lead,
+.storefront-theme .tc-lead.tc-cities__lead {
+  margin-inline: auto;
+  text-align: center;
+}
+
+.storefront-theme .tc-note {
+  margin-top: 1.75rem;
+  max-width: 44rem;
+  font-weight: 500;
+  color: var(--tc-text-2);
+}
+
+.storefront-theme .tc-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.85rem 1rem;
+  margin-top: 1.75rem;
+}
+
+.storefront-theme .tc-actions--center {
+  justify-content: center;
+}
+
+.storefront-theme .tc-actions [data-slot="button"],
+.storefront-theme .tc-btn--big {
+  min-height: 3.25rem;
+  padding-inline: 1.6rem;
+  font-size: 1.2rem;
+}
+
+.storefront-theme a.tc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.storefront-theme .tc-link {
+  font-family: var(--tc-font-display);
+  font-size: 1.2rem;
+  font-weight: 850;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--tc-text);
+  text-decoration: underline;
+  text-decoration-color: var(--tc-pink);
+  text-decoration-thickness: 3px;
+  text-underline-offset: 6px;
+  transition: color var(--tc-dur-1) ease, text-shadow var(--tc-dur-2) ease;
+}
+
+.storefront-theme .tc-link:hover {
+  color: var(--tc-word);
+}
+
+/* « À confirmer »: a small outlined tag. Night: cyan (10.49:1). Light: ink. */
+.storefront-theme .tc-tbc {
+  display: inline-block;
+  padding: 0.05em 0.6em 0.1em;
+  border: 1.5px dashed currentColor;
+  border-radius: var(--tc-r-pill);
+  color: var(--tc-cyan);
+  font-family: var(--tc-font-text);
+  font-size: 0.82em;
+  font-weight: 800;
+  font-style: normal;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  white-space: nowrap;
+  vertical-align: 0.06em;
+}
+
+.storefront-theme:not(.dark *) .tc-tbc:not(.tc-on-night *) {
+  color: var(--tc-ink);
+}
+
+/* ═══════════════════════════ 2. Night islands ═══════════════════════════ */
+/* The page heads (own and engine) are the black facade in both modes. Their
+   coloured word stays a neon tube even on the light site. */
+.storefront-theme .tc-hero,
+.storefront-theme main > div.min-h-screen:is(:has(> section .border-8):not(:has(> .storefront-hero)), :has(> section .lg\:grid-cols-5), :has(> section svg.lucide-book-open), :has(> section [data-slot="avatar"])) > section.bg-primary:first-child {
+  --tc-text: #fff5fa;
+  --tc-text-2: #d9cdd5;
+  --tc-word: #f784b8;
+  --tc-slab: #1c1917;
+  --tc-glow: 1;
+  --tc-halo-pink: 0 0 0.02em #fff, 0 0 0.12em #ff2e9a, 0 0 0.45em rgb(255 46 154 / 0.7), 0 0 1.1em rgb(245 120 176 / 0.45);
+  --tc-halo-cyan: 0 0 0.02em #fff, 0 0 0.12em #5dd1e3, 0 0 0.45em rgb(93 209 227 / 0.7), 0 0 1.1em rgb(93 209 227 / 0.4);
+  --primary: 333 86.2% 71.6%;
+  --primary-foreground: 24 9.8% 10%;
+  --foreground: 330 100% 98%;
+  --muted-foreground: 318 10.7% 82%;
+  color: var(--tc-text);
+}
+
+.storefront-theme:not(.dark *) :is(.tc-on-night, .tc-hero) :is(h1, h2, h3) > span:is(.italic, .not-italic) {
+  color: var(--tc-pink) !important;
+  background: none;
+  padding: 0;
+  text-shadow: var(--tc-halo-pink);
+}
+
+/* ═══════════════════════════ 3. Page head: the night street ═══════════════════════════ */
+
+.storefront-theme .tc-hero {
+  --tc-floor-h: clamp(5.5rem, 17svh, 12.5rem);
+  --tc-sun-w: clamp(8.5rem, 26vw, 21rem);
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  padding-top: calc(var(--tc-bar-h) + var(--tc-bar-top) + clamp(2.5rem, 7vw, 5rem));
+  padding-bottom: calc(var(--tc-floor-h) + var(--tc-sun-w) * 0.78 + 1.5rem);
+  background:
+    var(--tc-scanlines),
+    radial-gradient(70% 60% at 50% 100%, rgb(255 46 154 / 0.28), transparent 70%),
+    linear-gradient(180deg, var(--tc-night) 0%, #1d0f24 46%, #36113d 80%, #4a1546 100%);
+  border-bottom: 3px solid transparent;
+  border-image: var(--tc-neon-line) 1;
+}
+
+.storefront-theme .tc-hero__sky {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.storefront-theme .tc-hero__sun {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--tc-floor-h) - 2px);
+  width: var(--tc-sun-w);
+  aspect-ratio: 1;
+  translate: -50% 0;
+  background: url("/brand/sun.svg") center / contain no-repeat;
+  filter: drop-shadow(0 0 40px rgb(255 46 154 / 0.5));
+}
+
+.storefront-theme .tc-hero__floor {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--tc-floor-h);
+  background: url("/brand/floor.svg") center top / 100% 100% no-repeat;
+}
+
+.storefront-theme .tc-hero__grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2.5rem;
+  align-items: center;
+}
+
+.storefront-theme .tc-hero__kicker {
+  margin-bottom: 1.1rem;
+  font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+}
+
+.storefront-theme .tc-hero__title {
+  max-width: 13ch;
+  font-size: clamp(3.4rem, 10.5vw, 8.75rem) !important;
+  line-height: 0.86 !important;
+  letter-spacing: 0.002em;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.storefront-theme .tc-hero__intro {
+  max-width: 34rem;
+  margin-top: 1.4rem;
+  font-size: clamp(1.1rem, 1.7vw, 1.35rem);
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--tc-text-2);
+}
+
+.storefront-theme .tc-hero .tc-flag {
+  margin-top: 1.25rem;
+  font-size: 0.95rem;
+}
+
+@media (min-width: 1024px) {
+  .storefront-theme .tc-hero {
+    --tc-sun-w: clamp(16rem, 24vw, 22rem);
+    padding-bottom: calc(var(--tc-floor-h) + 3.5rem);
+    min-height: min(88svh, 820px);
+  }
+
+  .storefront-theme .tc-hero__sun {
+    left: auto;
+    right: 7%;
+    translate: 0 0;
+  }
+
+  .storefront-theme .tc-hero__text {
+    max-width: 58%;
+  }
+
+  .storefront-theme .tc-hero--split .tc-hero__grid {
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+  }
+
+  .storefront-theme .tc-hero--split .tc-hero__text {
+    max-width: none;
+  }
+
+  .storefront-theme .tc-hero--split .tc-hero__sun {
+    right: 12%;
+    bottom: calc(var(--tc-floor-h) - 2px);
+  }
+}
+
+/* A split head on phone/tablet: the aside sits above the sun. */
+@media (max-width: 1023px) {
+  .storefront-theme .tc-hero--split {
+    padding-bottom: calc(var(--tc-floor-h) + var(--tc-sun-w) * 0.55);
+  }
+}
+
+/* ═══════════════════════════ 4. Neon letters ═══════════════════════════ */
+.storefront-theme .tc-letters {
+  display: inline-flex;
+  white-space: nowrap;
+}
+
+.storefront-theme .tc-letters__l {
+  display: inline-block;
+  color: #ffd1ea;
+  text-shadow: var(--tc-halo-pink);
+}
+
+/* ═══════════════════════════ 5. /restaurant ═══════════════════════════ */
+
+.storefront-theme .tc-store__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(2rem, 4vw, 3.5rem);
+  align-items: center;
+}
+
+@media (min-width: 1024px) {
+  .storefront-theme .tc-store__grid {
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  }
+}
+
+/* The shopfront plane: one element in perspective (WebKit-safe). */
+.storefront-theme .tc-facade {
+  view-timeline: --tc-front block;
+}
+
+.storefront-theme .tc-facade__plane {
+  position: relative;
+  container-type: inline-size;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  background: var(--tc-night-3);
+  transform:
+    perspective(1400px)
+    rotateY(calc(var(--tc-ry) + var(--tc-px, 0) * 5deg))
+    rotateX(calc(var(--tc-py, 0) * -4deg));
+  transform-origin: 50% 50%;
+  box-shadow:
+    0 0 0 2px rgb(245 120 176 / 0.55),
+    -18px 26px 60px -22px rgb(255 46 154 / 0.55),
+    22px 26px 60px -22px rgb(93 209 227 / 0.45),
+    0 40px 70px -30px rgb(0 0 0 / 0.9);
+}
+
+.storefront-theme .tc-facade__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 62svh;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+/* The empty sign board of the illustration takes the shop's name in neon. */
+.storefront-theme .tc-facade__sign {
+  position: absolute;
+  left: 27.5%;
+  right: 11.5%;
+  top: 14.6%;
+  height: 16.6%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.2rem;
+  background: linear-gradient(180deg, #120d12, #0b080c);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.05);
+  font-family: var(--tc-font-display);
+  font-size: 7.4cqi;
+  font-style: italic;
+  font-weight: 950;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.storefront-theme .tc-facade__status {
+  position: absolute;
+  right: 12.5%;
+  top: 46%;
+}
+
+.storefront-theme .tc-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.35em 0.7em;
+  border-radius: 0.45rem;
+  background: #0b080c;
+  box-shadow: 0 0 0 1.5px rgb(255 255 255 / 0.18);
+  font-family: var(--tc-font-display);
+  font-size: clamp(0.8rem, 2.3cqi, 1.35rem);
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  text-transform: uppercase;
+  color: #fff5fa;
+}
+
+.storefront-theme .tc-status__lamp {
+  width: 0.55em;
+  height: 0.55em;
+  border-radius: 50%;
+  background: #8e7f8a;
+}
+
+.storefront-theme .tc-status--open {
+  color: var(--tc-cyan);
+  box-shadow: 0 0 0 1.5px var(--tc-cyan), 0 0 16px rgb(93 209 227 / 0.6);
+  text-shadow: 0 0 10px rgb(93 209 227 / 0.8);
+}
+
+.storefront-theme .tc-status--open .tc-status__lamp {
+  background: var(--tc-cyan);
+  box-shadow: 0 0 8px var(--tc-cyan);
+}
+
+.storefront-theme .tc-status--closed {
+  color: #ffd1ea;
+  box-shadow: 0 0 0 1.5px var(--tc-pink), 0 0 14px rgb(255 46 154 / 0.5);
+}
+
+.storefront-theme .tc-status--closed .tc-status__lamp {
+  background: var(--tc-pink);
+}
+
+/* Glass glare that follows the pointer (hover devices; 0 otherwise). */
+.storefront-theme .tc-facade__glare {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent calc(30% + var(--tc-px, 0) * 22%),
+    rgb(255 255 255 / 0.13) calc(42% + var(--tc-px, 0) * 22%),
+    transparent calc(54% + var(--tc-px, 0) * 22%)
+  );
+  mix-blend-mode: screen;
+}
+
+.storefront-theme .tc-facade__credit {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--tc-text-2);
+}
+
+/* The shop's card: a slab, address and phone set big. */
+.storefront-theme .tc-store__card {
+  border-radius: var(--tc-r-slab);
+  padding: clamp(1.5rem, 3.4vw, 2.75rem);
+  background: var(--tc-slab);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.07), 0 30px 50px -30px rgb(0 0 0 / 0.9);
+  background-image: var(--tc-neon-line);
+  background-size: 100% 4px;
+  background-repeat: no-repeat;
+}
+
+.storefront-theme:not(.dark *) .tc-store__card {
+  box-shadow: 0 26px 44px -26px rgb(14 58 66 / 0.75);
+}
+
+.storefront-theme .tc-store__name {
+  margin-top: 1rem;
+  font-size: clamp(1.9rem, 3.4vw, 2.6rem) !important;
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.storefront-theme .tc-store__sub {
+  display: block;
+  color: var(--tc-word);
+}
+
+.storefront-theme .tc-store__address {
+  margin-top: 1.25rem;
+  font-family: var(--tc-font-display);
+  font-size: clamp(2.1rem, 4.4vw, 3.1rem);
+  font-style: normal;
+  font-weight: 900;
+  line-height: 0.98;
+  text-transform: uppercase;
+  color: var(--tc-text);
+}
+
+.storefront-theme .tc-store__phone {
+  margin-top: 1.25rem;
+}
+
+.storefront-theme .tc-store__tel {
+  display: inline-flex;
+  align-items: center;
+  min-height: 3.5rem;
+  padding: 0.2rem 1.4rem;
+  border-radius: var(--tc-r-pill);
+  background: var(--tc-cyan);
+  color: var(--tc-ink) !important;
+  font-family: var(--tc-font-display);
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  text-decoration: none;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.55), 0 0 0 2px var(--tc-ink);
+  transition: translate var(--tc-dur-2) var(--tc-ease-snap), box-shadow var(--tc-dur-2) ease;
+}
+
+.storefront-theme .tc-store__tel:hover {
+  translate: 0 -2px;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.55), var(--tc-box-cyan);
+}
+
+.storefront-theme .tc-store__src {
+  margin-top: 0.85rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--tc-text-2);
+}
+
+.storefront-theme .tc-modes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.4rem;
+}
+
+.storefront-theme .tc-mode {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: var(--tc-r-pill);
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+
+.storefront-theme .tc-mode--yes {
+  background: var(--tc-pink);
+  color: var(--tc-ink);
+}
+
+.storefront-theme .tc-mode--yes::before {
+  content: "";
+  width: 0.8em;
+  height: 0.45em;
+  border-left: 3px solid currentColor;
+  border-bottom: 3px solid currentColor;
+  rotate: -45deg;
+  translate: 0 -0.12em;
+}
+
+.storefront-theme .tc-mode--no {
+  box-shadow: inset 0 0 0 2px var(--tc-line);
+  color: var(--tc-text-2);
+}
+
+/* Hours: the board of neon tubes, a night island in both modes. */
+.storefront-theme .tc-board {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  border-radius: var(--tc-r-slab);
+  padding: clamp(3.5rem, 6vw, 4.5rem) clamp(1.75rem, 4vw, 3.5rem) clamp(1.75rem, 4vw, 3.5rem);
+  background:
+    radial-gradient(60% 80% at 100% 0%, rgb(170 148 255 / 0.18), transparent 70%),
+    var(--tc-night);
+  box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.9);
+}
+
+.storefront-theme .tc-board::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 42px;
+  background-color: var(--tc-night);
+  background-image: var(--tc-led), linear-gradient(100deg, #ff2e9a 0%, #aa94ff 30%, #5dd1e3 50%, #aa94ff 70%, #ff2e9a 100%);
+  background-size: 14px 14px, 200% 100%;
+  -webkit-mask: linear-gradient(180deg, #000 40%, transparent);
+  mask: linear-gradient(180deg, #000 40%, transparent);
+}
+
+.storefront-theme .tc-board__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.storefront-theme .tc-board__head .tc-title {
+  margin-bottom: 0;
+}
+
+.storefront-theme .tc-board__note {
+  font-weight: 600;
+  color: var(--tc-text-2);
+}
+
+.storefront-theme .tc-hours {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.storefront-theme .tc-hours__row {
+  display: grid;
+  grid-template-columns: auto minmax(1.5rem, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.7rem 0.25rem;
+}
+
+.storefront-theme .tc-hours__day {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--tc-font-display);
+  font-size: clamp(1.45rem, 3vw, 2.2rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #fff5fa;
+}
+
+.storefront-theme .tc-hours__tube {
+  height: 3px;
+  border-radius: 3px;
+  background: rgb(170 148 255 / 0.45);
+  box-shadow: 0 0 6px rgb(170 148 255 / 0.4);
+}
+
+.storefront-theme .tc-hours__time {
+  font-family: var(--tc-font-display);
+  font-size: clamp(1.45rem, 3vw, 2.2rem);
+  font-style: italic;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--tc-cyan);
+  text-shadow: var(--tc-halo-cyan);
+}
+
+.storefront-theme .tc-hours__row--today .tc-hours__day {
+  color: var(--tc-pink);
+  text-shadow: var(--tc-halo-pink);
+}
+
+.storefront-theme .tc-hours__row--today .tc-hours__tube {
+  height: 4px;
+  background: var(--tc-pink);
+  box-shadow: 0 0 10px #ff2e9a, 0 0 22px rgb(255 46 154 / 0.6);
+}
+
+.storefront-theme .tc-hours__row--today .tc-hours__time {
+  color: var(--tc-pink);
+  text-shadow: var(--tc-halo-pink);
+}
+
+.storefront-theme .tc-hours__pill {
+  padding: 0.2em 0.6em;
+  border-radius: var(--tc-r-pill);
+  background: var(--tc-pink);
+  color: var(--tc-ink);
+  font-family: var(--tc-font-text);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: none;
+  text-shadow: none;
+}
+
+@media (max-width: 520px) {
+  .storefront-theme .tc-hours__row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.5rem 0.75rem;
+  }
+
+  .storefront-theme .tc-hours__tube {
+    display: none;
+  }
+}
+
+/* The cities: the ribbon crosses, the title stands under it. */
+.storefront-theme .tc-cities {
+  overflow-x: clip;
+}
+
+.storefront-theme .tc-cities__body {
+  margin-top: clamp(3rem, 6vw, 4.5rem);
+}
+
+/* Ribbon: separators after each word of a set (base.css draws the sun mark). */
+.storefront-theme .tc-ribbon__set > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 2.25rem;
+}
+
+.storefront-theme .tc-ribbon__track > span.tc-ribbon__set::after {
+  display: none;
+}
+
+.storefront-theme .tc-ribbon__set > span::after {
+  content: "";
+  width: 0.9em;
+  height: 0.9em;
+  flex: none;
+  background: url("/brand/mark.svg") center / contain no-repeat;
+}
+
+/* ═══════════════════════════ 6. /commander ═══════════════════════════ */
+
+/* The LED board of the counter, in the head. */
+.storefront-theme .tc-ledboard {
+  width: min(100%, 34rem);
+  margin-inline: auto;
+  padding: 0.9rem;
+  border-radius: 1.6rem;
+  background: #0b080c;
+  transform: perspective(1200px) rotateY(-14deg) rotateX(5deg);
+  box-shadow:
+    0 0 0 2px rgb(245 120 176 / 0.7),
+    0 0 30px rgb(255 46 154 / 0.35),
+    -30px 40px 60px -30px rgb(0 0 0 / 0.9);
+}
+
+.storefront-theme .tc-ledboard__screen {
+  overflow: clip;
+  padding-block: 0.9rem;
+  border-radius: 1rem;
+  background:
+    radial-gradient(circle, rgb(255 255 255 / 0.07) 0 1.2px, transparent 1.6px) 0 0 / 6px 6px,
+    #120c12;
+  filter: drop-shadow(0 0 6px rgb(255 46 154 / 0.7));
+}
+
+.storefront-theme .tc-ledboard__run {
+  display: block;
+  padding-left: 1rem;
+  white-space: nowrap;
+  font-family: var(--tc-font-display);
+  font-size: clamp(2.6rem, 6vw, 4.2rem);
+  font-weight: 950;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--tc-pink-soft);
+  -webkit-mask: radial-gradient(circle, #000 0 1.5px, transparent 1.9px) 0 0 / 4px 4px;
+  mask: radial-gradient(circle, #000 0 1.5px, transparent 1.9px) 0 0 / 4px 4px;
+}
+
+.storefront-theme .tc-ledboard__plate {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.8rem;
+  padding: 0.4rem 0.4rem 0.2rem;
+  font-weight: 800;
+  color: #fff5fa;
+}
+
+.storefront-theme .tc-ledboard__dot {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  background: var(--tc-cyan);
+  box-shadow: 0 0 10px var(--tc-cyan);
+}
+
+.storefront-theme .tc-demo {
+  padding-top: 2.5rem;
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+}
+
+/* Scene: the bag that fills with the three steps. */
+.storefront-theme .tc-bagscene {
+  view-timeline: --tc-bag block;
+  padding-block: clamp(3rem, 7vw, 5rem);
+}
+
+.storefront-theme .tc-bagscene__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(2.5rem, 5vw, 4rem);
+  align-items: center;
+}
+
+@media (min-width: 900px) {
+  .storefront-theme .tc-bagscene {
+    height: 220svh;
+    padding-block: 0;
+  }
+
+  .storefront-theme .tc-bagscene__pin {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    display: grid;
+    align-items: center;
+    padding-top: calc(var(--tc-bar-h) + var(--tc-bar-top));
+  }
+
+  .storefront-theme .tc-bagscene__grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr);
+  }
+}
+
+.storefront-theme .tc-steps {
+  display: grid;
+  gap: 1rem;
+}
+
+.storefront-theme .tc-step {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1.1rem;
+  align-items: start;
+  padding: 1.15rem 1.25rem;
+  border-radius: var(--tc-r-card);
+  background: var(--tc-slab);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 20px 36px -26px rgb(0 0 0 / 0.9);
+}
+
+.storefront-theme:not(.dark *) .tc-step {
+  box-shadow: 0 18px 32px -24px rgb(14 58 66 / 0.75);
+}
+
+.storefront-theme .tc-step__num {
+  display: grid;
+  place-items: center;
+  width: 3.4rem;
+  height: 3.4rem;
+  border-radius: 50%;
+  background: var(--tc-pink);
+  color: var(--tc-ink);
+  font-family: var(--tc-font-display);
+  font-size: 2.2rem;
+  font-style: italic;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.storefront-theme .tc-step--2 .tc-step__num {
+  background: var(--tc-cyan);
+}
+
+.storefront-theme .tc-step--3 .tc-step__num {
+  background: var(--tc-violet);
+}
+
+.storefront-theme .tc-step p {
+  margin-top: 0.35rem;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--tc-text-2);
+}
+
+/* The kraft bag: painted layers on one plane turned in perspective. */
+.storefront-theme .tc-bag {
+  position: relative;
+  width: min(25rem, 82%);
+  margin-inline: auto;
+  padding-top: 30%;
+}
+
+.storefront-theme .tc-bag__body {
+  position: relative;
+  aspect-ratio: 0.8;
+  max-height: 62svh;
+  margin-inline: auto;
+  transform: perspective(1200px) rotateY(var(--tc-bag-ry)) rotateX(4deg);
+}
+
+.storefront-theme .tc-bag__back {
+  position: absolute;
+  inset: 0 0 0 0;
+  border-radius: 0.5rem 0.5rem 0.9rem 0.9rem;
+  background:
+    linear-gradient(180deg, rgb(0 0 0 / 0.35), rgb(0 0 0 / 0.1) 30%),
+    var(--tc-kraft-dark);
+}
+
+.storefront-theme .tc-bag__handle {
+  position: absolute;
+  left: 28%;
+  width: 44%;
+  top: -24%;
+  height: 34%;
+  z-index: 1;
+  border: 0.75rem solid var(--tc-kraft-dark);
+  border-bottom: 0;
+  border-radius: 50% 50% 0 0 / 70% 70% 0 0;
+  filter: drop-shadow(0 2px 0 rgb(0 0 0 / 0.3));
+}
+
+.storefront-theme .tc-bag__item {
+  position: absolute;
+  z-index: 2;
+  display: block;
+  overflow: hidden;
+  border-radius: 0.9rem;
+  background: var(--tc-night);
+  box-shadow: 0 0 0 3px #fff, 0 18px 30px -12px rgb(0 0 0 / 0.8);
+}
+
+.storefront-theme .tc-bag__item img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.storefront-theme .tc-bag__item--1 {
+  left: -8%;
+  top: -8%;
+  width: 50%;
+  aspect-ratio: 16 / 10;
+  rotate: -14deg;
+}
+
+.storefront-theme .tc-bag__item--2 {
+  left: 30%;
+  top: -24%;
+  width: 48%;
+  aspect-ratio: 1;
+  rotate: 4deg;
+}
+
+.storefront-theme .tc-bag__item--3 {
+  right: -2%;
+  top: -10%;
+  width: 36%;
+  aspect-ratio: 0.82;
+  rotate: 14deg;
+  display: grid;
+  place-items: center;
+  background: var(--tc-cyan);
+}
+
+.storefront-theme .tc-bag__clock {
+  position: relative;
+  width: 56%;
+  aspect-ratio: 1;
+  margin-top: 22%;
+  border-radius: 50%;
+  border: 0.35rem solid var(--tc-ink);
+}
+
+.storefront-theme .tc-bag__clock::before,
+.storefront-theme .tc-bag__clock::after {
+  content: "";
+  position: absolute;
+  left: calc(50% - 0.15rem);
+  bottom: 50%;
+  width: 0.3rem;
+  height: 38%;
+  border-radius: 0.2rem;
+  background: var(--tc-ink);
+  transform-origin: 50% 100%;
+}
+
+.storefront-theme .tc-bag__clock::after {
+  height: 28%;
+  rotate: 110deg;
+}
+
+.storefront-theme .tc-bag__tag {
+  position: absolute;
+  left: 0.4rem;
+  top: 0.4rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 0.4rem;
+  background: var(--tc-pink);
+  color: var(--tc-ink);
+  font-size: 0.8rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.storefront-theme .tc-bag__front {
+  position: absolute;
+  left: -1%;
+  right: -1%;
+  bottom: 0;
+  top: 16%;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  border-radius: 0.3rem 0.3rem 0.9rem 0.9rem;
+  background-color: var(--tc-kraft);
+  background-image:
+    linear-gradient(90deg, rgb(0 0 0 / 0.12) 0 2px, transparent 2px calc(100% - 2px), rgb(0 0 0 / 0.12) calc(100% - 2px)),
+    linear-gradient(180deg, rgb(255 255 255 / 0.18) 0 6%, rgb(0 0 0 / 0.08) 6% 7%, transparent 7%),
+    repeating-linear-gradient(92deg, rgb(255 255 255 / 0.05) 0 2px, transparent 2px 7px),
+    linear-gradient(105deg, rgb(255 255 255 / 0.16), rgb(0 0 0 / 0.14));
+  box-shadow: inset 0 -12px 24px -12px rgb(0 0 0 / 0.35);
+  color: var(--tc-ink);
+}
+
+.storefront-theme .tc-bag__mark {
+  width: 34%;
+  aspect-ratio: 1;
+  background: url("/brand/mark.svg") center / contain no-repeat;
+}
+
+.storefront-theme .tc-bag__script {
+  font-family: var(--tc-font-script);
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  line-height: 0.8;
+  color: var(--tc-ink);
+}
+
+.storefront-theme .tc-bag__caps {
+  font-family: var(--tc-font-display);
+  font-size: clamp(1.6rem, 3.6vw, 2.4rem);
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.storefront-theme .tc-bag__shadow {
+  display: block;
+  width: 86%;
+  height: 1.4rem;
+  margin: 0.6rem auto 0;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 46 154 / 0.55), transparent);
+  filter: blur(4px);
+}
+
+/* Perks: a bento around the bag photo. */
+.storefront-theme .tc-perks {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+}
+
+.storefront-theme .tc-perks__photo {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--tc-r-slab);
+  background: var(--tc-night);
+}
+
+.storefront-theme .tc-perks__photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: 56svh;
+  object-fit: cover;
+}
+
+.storefront-theme .tc-perks__photo figcaption {
+  position: absolute;
+  left: 1rem;
+  bottom: 1rem;
+  font-size: 1.05rem;
+}
+
+.storefront-theme .tc-perks__list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.storefront-theme .tc-perk {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: 9.5rem;
+  padding: 1.15rem;
+  border-radius: var(--tc-r-card);
+  color: var(--tc-ink);
+  font-family: var(--tc-font-display);
+  font-size: clamp(1.45rem, 2.6vw, 2.15rem);
+  font-style: italic;
+  font-weight: 950;
+  line-height: 0.95;
+  text-transform: uppercase;
+  overflow: hidden;
+  transition: translate var(--tc-dur-2) var(--tc-ease-snap), box-shadow var(--tc-dur-2) ease;
+}
+
+.storefront-theme .tc-perk::before {
+  content: "";
+  position: absolute;
+  right: 0.8rem;
+  top: 0.8rem;
+  width: 3.2rem;
+  aspect-ratio: 1;
+  background: url("/brand/mark.svg") center / contain no-repeat;
+  opacity: 0.9;
+}
+
+.storefront-theme .tc-perk--pink { background: var(--tc-pink); }
+.storefront-theme .tc-perk--cyan { background: var(--tc-cyan); }
+.storefront-theme .tc-perk--violet { background: var(--tc-violet); }
+
+.storefront-theme .tc-perk--kraft {
+  background-color: var(--tc-kraft);
+  background-image: repeating-linear-gradient(92deg, rgb(255 255 255 / 0.06) 0 2px, transparent 2px 7px);
+}
+
+.storefront-theme:not(.dark *) .tc-perk {
+  box-shadow: 0 0 0 2px var(--tc-ink);
+}
+
+@media (hover: hover) {
+  .storefront-theme .tc-perk:hover {
+    translate: 0 -4px;
+    box-shadow: 0 0 0 2px var(--tc-ink), 0 16px 30px -14px rgb(0 0 0 / 0.7);
+  }
+}
+
+.storefront-theme .tc-perks__note {
+  font-weight: 500;
+  line-height: 1.55;
+  color: var(--tc-text-2);
+  font-size: 1.1rem;
+}
+
+@media (min-width: 900px) {
+  .storefront-theme .tc-perks {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    grid-template-rows: 1fr auto;
+  }
+
+  .storefront-theme .tc-perks__photo {
+    grid-row: 1 / 3;
+  }
+
+  .storefront-theme .tc-perks__photo img {
+    max-height: none;
+    aspect-ratio: 1;
+  }
+
+  .storefront-theme .tc-perk {
+    min-height: 12rem;
+  }
+}
+
+/* CTA: an LED frame around a night plate. */
+.storefront-theme .tc-go,
+.storefront-theme .tc-apply__aside {
+  position: relative;
+  isolation: isolate;
+  border: 3px solid transparent;
+  border-radius: var(--tc-r-slab);
+  padding: clamp(2.25rem, 6vw, 4.75rem) clamp(1.25rem, 4vw, 3rem);
+  background:
+    radial-gradient(70% 90% at 50% 120%, rgb(255 46 154 / 0.22), transparent 70%) padding-box,
+    linear-gradient(var(--tc-night), var(--tc-night)) padding-box,
+    linear-gradient(100deg, #ff2e9a 0%, #aa94ff 30%, #5dd1e3 50%, #aa94ff 70%, #ff2e9a 100%) 0 0 / 200% 100% border-box;
+  text-align: center;
+  box-shadow: 0 0 18px rgb(255 46 154 / 0.45), 0 0 50px rgb(93 209 227 / 0.2);
+}
+
+.storefront-theme .tc-go .tc-lead {
+  margin-inline: auto;
+}
+
+/* ═══════════════════════════ 7. /club-crousty ═══════════════════════════ */
+
+.storefront-theme .tc-club {
+  position: relative;
+  width: min(30rem, 100%);
+  margin-inline: auto;
+  padding-block: 2.5rem 1rem;
+}
+
+.storefront-theme .tc-club__card {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  transform: perspective(1100px) rotateY(-12deg) rotateX(4deg);
+  will-change: transform;
+}
+
+.storefront-theme .tc-club__face {
+  grid-area: 1 / 1;
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 1.586;
+  border-radius: 1.4rem;
+  padding: clamp(1rem, 4.5cqi, 1.6rem);
+  container-type: inline-size;
+  transition: opacity 0.01s linear;
+}
+
+.storefront-theme .tc-club__face--front {
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  background:
+    radial-gradient(120% 90% at 0% 0%, #ffd1ea 0%, transparent 55%),
+    linear-gradient(118deg, #ffa8f2 0%, #f578b0 26%, #aa94ff 54%, #5dd1e3 80%, #baeeff 100%);
+  color: var(--tc-ink);
+  box-shadow: 0 0 0 2px rgb(255 255 255 / 0.6), 0 30px 50px -24px rgb(0 0 0 / 0.85), 0 0 40px rgb(255 46 154 / 0.35);
+}
+
+/* Holographic sheen that follows the pointer. */
+.storefront-theme .tc-club__face--front::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    110deg,
+    transparent calc(var(--tc-sheen, 50%) - 22%),
+    rgb(255 255 255 / 0.55) var(--tc-sheen, 50%),
+    transparent calc(var(--tc-sheen, 50%) + 22%)
+  );
+  mix-blend-mode: soft-light;
+}
+
+.storefront-theme .tc-club__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.storefront-theme .tc-club__mark {
+  width: 16cqi;
+  aspect-ratio: 1;
+  background: url("/brand/mark.svg") center / contain no-repeat;
+}
+
+.storefront-theme .tc-club__chip {
+  width: 12cqi;
+  aspect-ratio: 1.3;
+  border-radius: 0.5rem;
+  background:
+    linear-gradient(90deg, transparent 32%, rgb(0 0 0 / 0.25) 32% 36%, transparent 36% 64%, rgb(0 0 0 / 0.25) 64% 68%, transparent 68%),
+    linear-gradient(180deg, transparent 45%, rgb(0 0 0 / 0.25) 45% 55%, transparent 55%),
+    linear-gradient(135deg, #ffe0b8, var(--tc-kraft));
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.25);
+}
+
+.storefront-theme .tc-club__script {
+  align-self: end;
+  font-family: var(--tc-font-script);
+  font-size: max(1.9rem, 13cqi);
+  line-height: 0.8;
+  color: #fff;
+  text-shadow: 0 2px 0 var(--tc-ink), 0 0 18px rgb(255 46 154 / 0.6);
+  rotate: -6deg;
+  transform-origin: left bottom;
+}
+
+.storefront-theme .tc-club__name {
+  margin-top: 0.3rem;
+  font-family: var(--tc-font-display);
+  font-size: max(1.1rem, 7cqi);
+  font-weight: 950;
+  line-height: 0.95;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.storefront-theme .tc-club__member {
+  display: flex;
+  gap: 1.4rem;
+  margin-top: 0.4rem;
+  font-size: max(0.78rem, 3.6cqi);
+}
+
+.storefront-theme .tc-club__member dt {
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.storefront-theme .tc-club__member dd {
+  font-family: var(--tc-font-display);
+  font-size: 1.5em;
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.storefront-theme .tc-club__demo {
+  position: absolute;
+  right: clamp(1rem, 4.5cqi, 1.6rem);
+  bottom: clamp(1rem, 4.5cqi, 1.6rem);
+  padding: 0.15rem 0.55rem;
+  border-radius: var(--tc-r-pill);
+  background: var(--tc-ink);
+  color: #fff5fa;
+  font-size: max(0.7rem, 3cqi);
+  font-weight: 800;
+}
+
+.storefront-theme .tc-club__face--back {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: 0.6rem;
+  opacity: 0;
+  background:
+    radial-gradient(80% 70% at 100% 0%, rgb(170 148 255 / 0.3), transparent 70%),
+    var(--tc-night);
+  color: #fff5fa;
+  box-shadow: 0 0 0 2px rgb(93 209 227 / 0.7), 0 30px 50px -24px rgb(0 0 0 / 0.85), 0 0 40px rgb(93 209 227 / 0.3);
+}
+
+.storefront-theme .tc-club[data-side="back"] .tc-club__face--front {
+  opacity: 0;
+}
+
+.storefront-theme .tc-club[data-side="back"] .tc-club__face--back {
+  opacity: 1;
+}
+
+/* When the scene drives the plane, the back is drawn pre-mirrored. */
+.storefront-theme .tc-club[data-live] .tc-club__face--back {
+  transform: scaleX(-1);
+}
+
+.storefront-theme .tc-stamps {
+  display: grid;
+  min-height: 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-rows: 1fr;
+  gap: 0.45rem;
+}
+
+.storefront-theme .tc-stamp {
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  border-radius: 0.8rem;
+  border: 2px dashed rgb(245 120 176 / 0.8);
+  font-family: var(--tc-font-display);
+  font-size: max(1rem, 7cqi);
+  font-weight: 950;
+  line-height: 1;
+  color: var(--tc-pink);
+  text-align: center;
+}
+
+.storefront-theme .tc-stamp--on {
+  border: 0;
+  background: url("/brand/mark.svg") center / 74% no-repeat, var(--tc-pink);
+}
+
+.storefront-theme .tc-stamp--gift {
+  border: 0;
+  padding: 0.2rem;
+  background: var(--tc-cyan);
+  color: var(--tc-ink);
+  font-size: max(0.82rem, 4.2cqi);
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.storefront-theme .tc-club__backfoot {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: max(0.72rem, 3.1cqi);
+  font-weight: 600;
+  line-height: 1.3;
+  color: #e9dde4;
+}
+
+.storefront-theme .tc-qr {
+  flex: none;
+  width: max(3rem, 15cqi);
+  height: auto;
+}
+
+.storefront-theme .tc-club__flip {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 1.4rem auto 0;
+  min-height: 2.9rem;
+  padding: 0 1.25rem;
+  border: 0;
+  border-radius: var(--tc-r-pill);
+  background: #fff;
+  color: var(--tc-pink-deep);
+  font-family: var(--tc-font-display);
+  font-size: 1.1rem;
+  font-weight: 850;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 0 0 2px var(--tc-ink);
+  transition: translate var(--tc-dur-2) var(--tc-ease-snap), box-shadow var(--tc-dur-2) ease;
+}
+
+.storefront-theme .tc-club__flip:hover {
+  translate: 0 -2px;
+  box-shadow: 0 0 0 2px var(--tc-ink), var(--tc-box-cyan);
+}
+
+.storefront-theme .tc-club__flip-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  border: 3px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+}
+
+/* Balloons: pink, light blue, white, violet, posed around the card. */
+.storefront-theme .tc-club__balloons {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.storefront-theme .tc-balloon {
+  position: absolute;
+  width: clamp(3.6rem, 11vw, 5.6rem);
+  aspect-ratio: 0.84;
+  border-radius: 50% 50% 48% 52% / 56% 56% 44% 44%;
+  transform-origin: 50% 130%;
+}
+
+.storefront-theme .tc-balloon::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  width: 10px;
+  height: 8px;
+  translate: -50% 0;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  background: inherit;
+}
+
+.storefront-theme .tc-balloon::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 2px;
+  height: 120%;
+  background: linear-gradient(rgb(255 255 255 / 0.7), rgb(255 255 255 / 0));
+}
+
+.storefront-theme .tc-balloon--pink {
+  left: -6%;
+  top: -4%;
+  background: radial-gradient(circle at 32% 28%, #fff 0 6%, #ffa8f2 14%, #f578b0 52%, #c93a7d 100%);
+}
+
+.storefront-theme .tc-balloon--blue {
+  right: -4%;
+  top: -10%;
+  width: clamp(4rem, 12vw, 6.2rem);
+  background: radial-gradient(circle at 32% 28%, #fff 0 6%, #e3f8ff 16%, #baeeff 50%, #6fbfd9 100%);
+}
+
+.storefront-theme .tc-balloon--white {
+  left: 4%;
+  bottom: 6%;
+  width: clamp(3rem, 9vw, 4.6rem);
+  background: radial-gradient(circle at 32% 28%, #fff 0 20%, #f3eef2 50%, #c9bcc5 100%);
+}
+
+.storefront-theme .tc-balloon--violet {
+  right: -8%;
+  bottom: 18%;
+  width: clamp(3.2rem, 10vw, 5rem);
+  background: radial-gradient(circle at 32% 28%, #fff 0 6%, #d4c9ff 16%, #aa94ff 52%, #6c55c9 100%);
+}
+
+/* How it works: three giant neon digits. */
+.storefront-theme .tc-how {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .storefront-theme .tc-how {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.storefront-theme .tc-how__item {
+  position: relative;
+  padding: 1.5rem;
+  border-radius: var(--tc-r-card);
+  background: var(--tc-slab);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 22px 40px -28px rgb(0 0 0 / 0.9);
+}
+
+.storefront-theme:not(.dark *) .tc-how__item {
+  box-shadow: 0 22px 40px -26px rgb(14 58 66 / 0.75);
+}
+
+.storefront-theme .tc-how__num {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-family: var(--tc-font-display);
+  font-size: clamp(6rem, 12vw, 9rem);
+  font-style: italic;
+  font-weight: 950;
+  line-height: 0.8;
+  color: transparent;
+  -webkit-text-stroke: 3px var(--tc-pink);
+  text-shadow: 0 0 18px rgb(255 46 154 / calc(0.7 * var(--tc-glow)));
+}
+
+.storefront-theme .tc-how__item:nth-child(2) .tc-how__num {
+  -webkit-text-stroke-color: var(--tc-cyan);
+  text-shadow: 0 0 18px rgb(93 209 227 / calc(0.7 * var(--tc-glow)));
+}
+
+.storefront-theme .tc-how__item:nth-child(3) .tc-how__num {
+  -webkit-text-stroke-color: var(--tc-violet);
+  text-shadow: 0 0 18px rgb(170 148 255 / calc(0.7 * var(--tc-glow)));
+}
+
+.storefront-theme:not(.dark *) .tc-how__num {
+  color: var(--tc-pink);
+  -webkit-text-stroke: 3px var(--tc-ink) !important;
+  text-shadow: none !important;
+}
+
+.storefront-theme:not(.dark *) .tc-how__item:nth-child(2) .tc-how__num { color: var(--tc-cyan); }
+.storefront-theme:not(.dark *) .tc-how__item:nth-child(3) .tc-how__num { color: var(--tc-violet); }
+
+.storefront-theme .tc-how__item p {
+  margin-top: 0.5rem;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--tc-text-2);
+}
+
+/* Rewards: the till receipt. */
+.storefront-theme .tc-rewards {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2.5rem;
+  align-items: center;
+}
+
+@media (min-width: 900px) {
+  .storefront-theme .tc-rewards {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+  }
+}
+
+.storefront-theme .tc-receipt {
+  --tc-teeth: 14px;
+  width: min(100%, 27rem);
+  margin-inline: auto;
+  padding: 1.75rem 1.5rem calc(1.5rem + var(--tc-teeth));
+  background: #fff;
+  color: var(--tc-ink);
+  rotate: 2deg;
+  -webkit-mask:
+    linear-gradient(#000 0 0) top / 100% calc(100% - var(--tc-teeth)) no-repeat,
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / calc(var(--tc-teeth) * 2) var(--tc-teeth) repeat-x;
+  mask:
+    linear-gradient(#000 0 0) top / 100% calc(100% - var(--tc-teeth)) no-repeat,
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / calc(var(--tc-teeth) * 2) var(--tc-teeth) repeat-x;
+  filter: drop-shadow(0 20px 26px rgb(0 0 0 / 0.45));
+}
+
+.storefront-theme .tc-receipt__title {
+  padding-bottom: 0.9rem;
+  margin-bottom: 0.6rem;
+  border-bottom: 2px dashed var(--tc-ink);
+  font-family: var(--tc-font-display);
+  font-size: 2rem;
+  font-weight: 950;
+  letter-spacing: 0.04em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.storefront-theme .tc-receipt__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px dotted rgb(20 16 21 / 0.45);
+  font-size: 0.98rem;
+}
+
+.storefront-theme .tc-receipt__row dt {
+  font-weight: 600;
+}
+
+.storefront-theme .tc-receipt__row dd {
+  font-weight: 800;
+  text-align: right;
+}
+
+.storefront-theme .tc-receipt__row .tc-tbc {
+  color: var(--tc-ink) !important;
+}
+
+.storefront-theme .tc-receipt__row--hit {
+  margin-inline: -0.6rem;
+  padding-inline: 0.6rem;
+  border-radius: 0.5rem;
+  background: var(--tc-pink);
+  border-bottom: 0;
+}
+
+.storefront-theme .tc-receipt__foot {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* QR game: the turquoise wall at night, an ink island on the light site. */
+.storefront-theme .tc-qrgame {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2rem;
+  align-items: center;
+  padding: clamp(1.75rem, 5vw, 3.5rem);
+  border-radius: var(--tc-r-slab);
+  background: var(--tc-cyan);
+  color: var(--tc-ink);
+}
+
+.storefront-theme .tc-qrgame .tc-h2 {
+  color: var(--tc-ink);
+  margin-block: 0.9rem 1.5rem;
+}
+
+.storefront-theme .tc-qrgame .tc-h2 > span.italic {
+  color: var(--tc-ink) !important;
+  background: var(--tc-pink);
+  padding: 0.02em 0.18em 0.04em;
+  border-radius: 0.18em;
+  text-shadow: none;
+}
+
+.storefront-theme .tc-qrgame p {
+  max-width: 34rem;
+  font-weight: 600;
+  line-height: 1.55;
+}
+
+.storefront-theme .tc-qrgame p + p {
+  margin-top: 0.8rem;
+}
+
+.storefront-theme .tc-qrgame .tc-tbc {
+  color: var(--tc-ink);
+}
+
+.storefront-theme:not(.dark *) .tc-qrgame {
+  background: var(--tc-night);
+  color: #fff5fa;
+}
+
+.storefront-theme:not(.dark *) .tc-qrgame .tc-h2 {
+  color: #fff5fa;
+}
+
+.storefront-theme:not(.dark *) .tc-qrgame .tc-tbc {
+  color: var(--tc-cyan);
+}
+
+.storefront-theme .tc-qrgame__scan {
+  position: relative;
+  width: min(100%, 22rem);
+  aspect-ratio: 1;
+  margin-inline: auto;
+  border-radius: 1.4rem;
+  background: url("/photos/crousty-blanche-sm.webp") center / cover, var(--tc-night);
+  box-shadow: 0 0 0 4px var(--tc-ink);
+}
+
+.storefront-theme .tc-qrgame__scan::before {
+  content: "";
+  position: absolute;
+  inset: 8%;
+  background:
+    linear-gradient(#fff, #fff) 0 0 / 22% 5px no-repeat,
+    linear-gradient(#fff, #fff) 0 0 / 5px 22% no-repeat,
+    linear-gradient(#fff, #fff) 100% 0 / 22% 5px no-repeat,
+    linear-gradient(#fff, #fff) 100% 0 / 5px 22% no-repeat,
+    linear-gradient(#fff, #fff) 0 100% / 22% 5px no-repeat,
+    linear-gradient(#fff, #fff) 0 100% / 5px 22% no-repeat,
+    linear-gradient(#fff, #fff) 100% 100% / 22% 5px no-repeat,
+    linear-gradient(#fff, #fff) 100% 100% / 5px 22% no-repeat;
+  filter: drop-shadow(0 0 6px rgb(255 255 255 / 0.7));
+}
+
+.storefront-theme .tc-qrgame__beam {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: 50%;
+  height: 4px;
+  border-radius: 4px;
+  background: var(--tc-pink);
+  box-shadow: 0 0 12px #ff2e9a, 0 0 30px rgb(255 46 154 / 0.7);
+}
+
+@media (min-width: 900px) {
+  .storefront-theme .tc-qrgame {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  }
+}
+
+/* FAQ: slabs that open. */
+.storefront-theme .tc-faq {
+  display: grid;
+  gap: 0.8rem;
+  max-width: 52rem;
+}
+
+.storefront-theme .tc-faq details {
+  border-radius: var(--tc-r-card);
+  background: var(--tc-slab);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06);
+  transition: box-shadow var(--tc-dur-2) ease;
+}
+
+.storefront-theme .tc-faq details[open] {
+  box-shadow: inset 4px 0 0 var(--tc-pink), 0 0 24px rgb(255 46 154 / calc(0.2 * var(--tc-glow)));
+}
+
+.storefront-theme .tc-faq summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.35rem;
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--tc-font-display);
+  font-size: clamp(1.3rem, 2.2vw, 1.65rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  border-radius: var(--tc-r-card);
+}
+
+.storefront-theme .tc-faq summary::-webkit-details-marker {
+  display: none;
+}
+
+.storefront-theme .tc-faq summary::after {
+  content: "";
+  flex: none;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  background:
+    linear-gradient(var(--tc-ink), var(--tc-ink)) center / 46% 3px no-repeat,
+    linear-gradient(var(--tc-ink), var(--tc-ink)) center / 3px 46% no-repeat,
+    var(--tc-pink);
+  transition: rotate var(--tc-dur-2) var(--tc-ease-snap);
+}
+
+.storefront-theme .tc-faq details[open] summary::after {
+  rotate: 45deg;
+}
+
+.storefront-theme .tc-faq details p {
+  padding: 0 1.35rem 1.25rem;
+  font-weight: 500;
+  line-height: 1.6;
+  color: var(--tc-text-2);
+}
+
+/* ═══════════════════════════ 8. /franchise ═══════════════════════════ */
+
+/* Why join: a bento of four photo cards. */
+.storefront-theme .tc-bento {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+}
+
+.storefront-theme .tc-bento__card {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  overflow: hidden;
+  border-radius: var(--tc-r-slab);
+  background: var(--tc-slab);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 26px 44px -30px rgb(0 0 0 / 0.95);
+  transition: translate var(--tc-dur-2) var(--tc-ease-snap), box-shadow var(--tc-dur-2) ease;
+}
+
+.storefront-theme:not(.dark *) .tc-bento__card {
+  box-shadow: 0 24px 40px -26px rgb(14 58 66 / 0.75);
+}
+
+.storefront-theme .tc-bento__media {
+  position: relative;
+  overflow: hidden;
+  background: var(--tc-night);
+}
+
+.storefront-theme .tc-bento__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 16 / 10;
+  max-height: 44svh;
+  object-fit: cover;
+  transition: scale 0.8s var(--tc-ease-out);
+}
+
+.storefront-theme .tc-bento__body {
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+.storefront-theme .tc-bento__quote {
+  margin-top: 0.7rem;
+  font-family: var(--tc-font-display);
+  font-size: 1.35rem;
+  font-style: italic;
+  font-weight: 850;
+  line-height: 1.05;
+  text-transform: uppercase;
+  color: var(--tc-word);
+}
+
+.storefront-theme .tc-bento__body > p:last-child {
+  margin-top: 0.7rem;
+  font-weight: 500;
+  line-height: 1.55;
+  color: var(--tc-text-2);
+}
+
+@media (hover: hover) {
+  .storefront-theme .tc-bento__card:hover {
+    translate: 0 -4px;
+    box-shadow: var(--tc-box-pink), 0 26px 44px -30px rgb(0 0 0 / 0.95);
+  }
+
+  .storefront-theme .tc-bento__card:hover img {
+    scale: 1.05;
+  }
+}
+
+@media (min-width: 768px) {
+  .storefront-theme .tc-bento {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .storefront-theme .tc-bento__card--1 { grid-column: 1 / 4; grid-row: 1 / 3; }
+  .storefront-theme .tc-bento__card--2 { grid-column: 4 / 7; }
+  .storefront-theme .tc-bento__card--3 { grid-column: 4 / 7; }
+  .storefront-theme .tc-bento__card--4 { grid-column: 1 / 7; }
+
+  .storefront-theme .tc-bento__card--1 .tc-bento__media img {
+    aspect-ratio: 1;
+    max-height: none;
+  }
+
+  .storefront-theme :is(.tc-bento__card--2, .tc-bento__card--3, .tc-bento__card--4) {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr);
+  }
+
+  .storefront-theme :is(.tc-bento__card--2, .tc-bento__card--3, .tc-bento__card--4) .tc-bento__media img {
+    aspect-ratio: auto;
+    max-height: none;
+    min-height: 100%;
+  }
+
+  .storefront-theme .tc-bento__card--4 {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  }
+
+  .storefront-theme .tc-bento__card--4 .tc-bento__media img {
+    aspect-ratio: 21 / 9;
+  }
+}
+
+/* Scene: the four steps build the shopfront. */
+.storefront-theme .tc-build {
+  view-timeline: --tc-build block;
+  padding-block: clamp(3rem, 7vw, 5rem);
+  background:
+    radial-gradient(60% 50% at 80% 60%, rgb(170 148 255 / calc(0.14 * var(--tc-glow))), transparent 70%);
+}
+
+.storefront-theme .tc-build__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(2.5rem, 5vw, 4rem);
+  align-items: center;
+}
+
+@media (min-width: 900px) {
+  .storefront-theme .tc-build {
+    height: 230svh;
+    padding-block: 0;
+  }
+
+  .storefront-theme .tc-build__pin {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    display: grid;
+    align-items: center;
+    padding-top: calc(var(--tc-bar-h) + var(--tc-bar-top));
+  }
+
+  .storefront-theme .tc-build__grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+.storefront-theme .tc-build__steps {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.storefront-theme .tc-build__step {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+  padding: 0.95rem 1.1rem;
+  border-radius: var(--tc-r-card);
+  background: var(--tc-slab);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06);
+}
+
+.storefront-theme:not(.dark *) .tc-build__step {
+  box-shadow: 0 16px 30px -24px rgb(14 58 66 / 0.75);
+}
+
+.storefront-theme .tc-build__step .tc-h3 {
+  font-size: clamp(1.4rem, 2.2vw, 1.8rem);
+}
+
+.storefront-theme .tc-build__step p {
+  margin-top: 0.25rem;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--tc-text-2);
+}
+
+.storefront-theme .tc-build__tbc {
+  font-size: 0.92rem;
+  font-weight: 700 !important;
+}
+
+.storefront-theme .tc-build__num {
+  display: grid;
+  place-items: center;
+  width: 2.9rem;
+  height: 2.9rem;
+  border-radius: 50%;
+  background: var(--tc-pink);
+  color: var(--tc-ink);
+  font-family: var(--tc-font-display);
+  font-size: 1.8rem;
+  font-style: italic;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.storefront-theme .tc-build__step--2 .tc-build__num { background: var(--tc-cyan); }
+.storefront-theme .tc-build__step--3 .tc-build__num { background: var(--tc-violet); }
+.storefront-theme .tc-build__step--4 .tc-build__num { background: var(--tc-pink-soft); }
+
+/* The shopfront drawn in CSS: street, wall, window, door, awning, sign. */
+.storefront-theme .tc-shop {
+  position: relative;
+  width: min(32rem, 100%);
+  aspect-ratio: 1 / 0.95;
+  max-height: 64svh;
+  margin-inline: auto;
+}
+
+.storefront-theme .tc-shop > span {
+  position: absolute;
+  display: block;
+}
+
+.storefront-theme .tc-shop__street {
+  left: -4%;
+  right: -4%;
+  bottom: 0;
+  height: 9%;
+  border-radius: 0.6rem;
+  background:
+    linear-gradient(90deg, transparent 10%, rgb(255 46 154 / 0.35) 30%, transparent 45%, rgb(93 209 227 / 0.35) 62%, transparent 80%),
+    linear-gradient(180deg, #2a2230, #0b080c);
+}
+
+.storefront-theme .tc-shop__wall {
+  left: 4%;
+  right: 4%;
+  top: 18%;
+  bottom: 9%;
+  border-radius: 0.4rem 0.4rem 0 0;
+  background:
+    linear-gradient(90deg, rgb(255 255 255 / 0.05) 0 2px, transparent 2px) 0 0 / 25% 100%,
+    linear-gradient(180deg, #19141a, #0b080c);
+  box-shadow: 0 0 0 2px rgb(255 255 255 / 0.08), 0 30px 50px -20px rgb(0 0 0 / 0.9);
+}
+
+.storefront-theme .tc-shop__window {
+  position: absolute;
+  left: 7%;
+  right: 38%;
+  top: 30%;
+  bottom: 12%;
+  overflow: hidden;
+  border-radius: 0.3rem;
+  background:
+    radial-gradient(40% 30% at 30% 30%, rgb(255 168 242 / 0.7), transparent 70%),
+    radial-gradient(30% 30% at 75% 35%, rgb(186 238 255 / 0.6), transparent 70%),
+    linear-gradient(180deg, #f6dfe9 0%, #e7c3d6 55%, #2a1b26 56%);
+  box-shadow: inset 0 0 0 4px #0b080c;
+}
+
+.storefront-theme .tc-shop__led {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 40%;
+  background-color: var(--tc-night);
+  background-image: var(--tc-led), linear-gradient(100deg, #ff2e9a 0%, #aa94ff 30%, #5dd1e3 50%, #aa94ff 70%, #ff2e9a 100%);
+  background-size: 12px 12px, 200% 100%;
+}
+
+.storefront-theme .tc-shop__door {
+  position: absolute;
+  right: 9%;
+  width: 22%;
+  top: 30%;
+  bottom: 0;
+  border-radius: 0.3rem 0.3rem 0 0;
+  background:
+    linear-gradient(90deg, transparent 78%, #c9bcc5 78% 82%, transparent 82%) 0 55% / 100% 18% no-repeat,
+    linear-gradient(160deg, rgb(255 255 255 / 0.12), transparent 40%),
+    #221a24;
+  box-shadow: inset 0 0 0 4px #0b080c;
+}
+
+.storefront-theme .tc-shop__awning {
+  left: 1%;
+  right: 1%;
+  top: 33%;
+  height: 13%;
+  background:
+    repeating-linear-gradient(90deg, #5dd1e3 0 12.5%, #3fb6c9 12.5% 25%);
+  -webkit-mask: radial-gradient(farthest-side at 50% 0, #000 97%, #0000) bottom / 12.5% 24% repeat-x, linear-gradient(#000 0 0) top / 100% 76.5% no-repeat;
+  mask: radial-gradient(farthest-side at 50% 0, #000 97%, #0000) bottom / 12.5% 24% repeat-x, linear-gradient(#000 0 0) top / 100% 76.5% no-repeat;
+  filter: drop-shadow(0 10px 8px rgb(0 0 0 / 0.5));
+}
+
+.storefront-theme .tc-shop__sign {
+  left: 4%;
+  right: 4%;
+  top: 0;
+  height: 22%;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 3%;
+  border-radius: 0.5rem;
+  background: #0b080c;
+  box-shadow: 0 0 0 2px rgb(255 255 255 / 0.1), 0 0 34px rgb(255 46 154 / 0.35);
+  container-type: inline-size;
+}
+
+.storefront-theme .tc-shop__disc {
+  width: 18cqi;
+  aspect-ratio: 1;
+  background: url("/brand/mark.svg") center / contain no-repeat;
+  filter: drop-shadow(0 0 12px rgb(255 46 154 / 0.7));
+}
+
+.storefront-theme .tc-shop__tasty {
+  font-family: var(--tc-font-script);
+  font-size: 15cqi;
+  line-height: 1;
+  color: var(--tc-pink);
+  text-shadow: var(--tc-halo-pink);
+  rotate: -6deg;
+}
+
+.storefront-theme .tc-shop__crousty {
+  font-family: var(--tc-font-display);
+  font-size: 12cqi;
+  font-weight: 950;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 0 10px rgb(255 255 255 / 0.5);
+}
+
+.storefront-theme .tc-shop__open {
+  left: 50%;
+  top: 52%;
+  translate: -50% 0;
+  rotate: -4deg;
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  white-space: nowrap;
+}
+
+/* Profile. */
+.storefront-theme .tc-profile {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .storefront-theme .tc-profile {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  }
+}
+
+.storefront-theme .tc-ticks {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.storefront-theme .tc-ticks li {
+  position: relative;
+  padding: 1.1rem 1.25rem 1.1rem 4rem;
+  border-radius: var(--tc-r-card);
+  background: var(--tc-slab);
+  font-size: 1.12rem;
+  font-weight: 700;
+  line-height: 1.4;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06);
+}
+
+.storefront-theme:not(.dark *) .tc-ticks li {
+  box-shadow: 0 14px 26px -20px rgb(14 58 66 / 0.75);
+}
+
+.storefront-theme .tc-ticks li::before {
+  content: "";
+  position: absolute;
+  left: 1.1rem;
+  top: 50%;
+  width: 2rem;
+  height: 2rem;
+  translate: 0 -50%;
+  border-radius: 50%;
+  background: var(--tc-pink);
+  box-shadow: 0 0 14px rgb(255 46 154 / calc(0.6 * var(--tc-glow)));
+}
+
+.storefront-theme .tc-ticks li::after {
+  content: "";
+  position: absolute;
+  left: 1.62rem;
+  top: 50%;
+  width: 0.95rem;
+  height: 0.5rem;
+  translate: 0 -70%;
+  border-left: 3px solid var(--tc-ink);
+  border-bottom: 3px solid var(--tc-ink);
+  rotate: -45deg;
+}
+
+.storefront-theme .tc-ticks .tc-ticks__tbc {
+  font-weight: 600;
+  color: var(--tc-text-2);
+  background: transparent;
+  box-shadow: inset 0 0 0 2px var(--tc-line);
+}
+
+.storefront-theme .tc-ticks .tc-ticks__tbc::before {
+  background: transparent;
+  box-shadow: inset 0 0 0 2px var(--tc-line);
+}
+
+.storefront-theme .tc-ticks .tc-ticks__tbc::after {
+  display: none;
+}
+
+/* Application: the demo form on a slab, the direct contact in an LED frame. */
+.storefront-theme .tc-apply {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .storefront-theme .tc-apply {
+    grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+  }
+
+  .storefront-theme .tc-apply__aside {
+    position: sticky;
+    top: calc(var(--tc-bar-h) + var(--tc-bar-top) + 1.5rem);
+  }
+}
+
+.storefront-theme .tc-apply__aside {
+  text-align: left;
+  padding: 1.75rem 1.5rem;
+}
+
+.storefront-theme .tc-apply__aside p {
+  margin-top: 0.8rem;
+  font-weight: 500;
+  line-height: 1.55;
+  color: var(--tc-text-2);
+}
+
+.storefront-theme .tc-mail {
+  display: inline-block;
+  font-family: var(--tc-font-display);
+  font-size: clamp(1.35rem, 2.4vw, 1.7rem);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  overflow-wrap: anywhere;
+  color: var(--tc-cyan) !important;
+  text-shadow: var(--tc-halo-cyan);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 5px;
+}
+
+.storefront-theme .tc-form {
+  margin-top: 1.5rem;
+  padding: clamp(1.25rem, 3.5vw, 2.25rem);
+  border-radius: var(--tc-r-slab);
+  background-color: var(--tc-slab);
+  background-image: var(--tc-neon-line);
+  background-size: 100% 4px;
+  background-repeat: no-repeat;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 30px 50px -30px rgb(0 0 0 / 0.9);
+}
+
+.storefront-theme:not(.dark *) .tc-form {
+  box-shadow: 0 26px 44px -26px rgb(14 58 66 / 0.75);
+}
+
+.storefront-theme .tc-form-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.1rem 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .storefront-theme .tc-form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .storefront-theme .tc-field--wide {
+    grid-column: 1 / -1;
+  }
+}
+
+.storefront-theme .tc-field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.storefront-theme .tc-form label {
+  font-family: var(--tc-font-display);
+  font-size: 1.05rem;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.storefront-theme .tc-form :is(input, textarea) {
+  min-height: 3.25rem;
+  font-size: 1rem;
+  background: var(--tc-slab-2);
+  color: var(--tc-text);
+}
+
+.storefront-theme .tc-form textarea {
+  min-height: 8.5rem;
+}
+
+.storefront-theme .tc-form [aria-invalid="true"] {
+  border-color: hsl(var(--destructive)) !important;
+}
+
+.storefront-theme .tc-err {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: hsl(var(--destructive));
+}
+
+.storefront-theme .tc-hint {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--tc-text-2);
+}
+
+.storefront-theme .tc-form-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.storefront-theme .tc-confirm--on {
+  margin-top: 1.5rem;
+  padding: 1.25rem 1.4rem;
+  border-radius: var(--tc-r-card);
+  background: var(--tc-pink);
+  color: var(--tc-ink);
+  rotate: -1deg;
+}
+
+.storefront-theme .tc-confirm--on p {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem 1rem;
+}
+
+.storefront-theme .tc-confirm__script {
+  font-family: var(--tc-font-script);
+  font-size: 2.6rem;
+  line-height: 1;
+}
+
+.storefront-theme .tc-confirm__text {
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+/* ═══════════════════════════ 9. Engine pages ═══════════════════════════ */
+/* Engine page scopes (no page class exists; each is recognised by its markup):
+     about    main > div.min-h-screen:has(> section .border-8):not(:has(> .storefront-hero))        story photo frame
+     contact  main > div.min-h-screen:has(> section .lg\:grid-cols-5) form + side cards
+     blog     main > div.min-h-screen:has(> section svg.lucide-book-open)
+     account  main > div.min-h-screen:has(> section [data-slot="avatar"])
+     article  main > div.min-h-screen:has(> article)
+     legal    main > main
+     auth     .storefront-theme:not(:has(> header)) > div.min-h-screen
+     404      [data-testid="storefront-not-found"] */
+
+/* ── 9.1 The engine page heads: the same night street as .tc-hero ── */
+.storefront-theme main > div.min-h-screen:is(:has(> section .border-8):not(:has(> .storefront-hero)), :has(> section .lg\:grid-cols-5), :has(> section svg.lucide-book-open), :has(> section [data-slot="avatar"])) {
+  background: transparent !important;
+}
+
+.storefront-theme main > div.min-h-screen:is(:has(> section .border-8):not(:has(> .storefront-hero)), :has(> section .lg\:grid-cols-5), :has(> section svg.lucide-book-open), :has(> section [data-slot="avatar"])) > section.bg-primary:first-child {
+  --tc-floor-h: clamp(5rem, 16svh, 11.5rem);
+  --tc-sun-w: clamp(8rem, 24vw, 13rem);
+  position: relative;
+  isolation: isolate;
+  overflow: clip !important;
+  border-radius: 0 !important;
+  margin-top: 0 !important;
+  padding-top: calc(var(--tc-bar-h) + var(--tc-bar-top) + clamp(2.5rem, 6vw, 4.5rem)) !important;
+  padding-bottom: calc(var(--tc-floor-h) + var(--tc-sun-w) * 0.8 + 1.75rem) !important;
+  background:
+    var(--tc-scanlines),
+    radial-gradient(70% 60% at 50% 100%, rgb(255 46 154 / 0.28), transparent 70%),
+    linear-gradient(180deg, var(--tc-night) 0%, #1d0f24 46%, #36113d 80%, #4a1546 100%) !important;
+  border-bottom: 3px solid transparent;
+  border-image: var(--tc-neon-line) 1;
+}
+
+/* The account page pads its wrapper for the old header: the head clears it. */
+.storefront-theme main > div.min-h-screen.pt-20:has(> section [data-slot="avatar"]) {
+  padding-top: 0 !important;
+}
+
+.storefront-theme main > div.min-h-screen:is(:has(> section .border-8):not(:has(> .storefront-hero)), :has(> section .lg\:grid-cols-5), :has(> section svg.lucide-book-open), :has(> section [data-slot="avatar"])) > section.bg-primary:first-child > div.absolute {
+  display: none;
+}
+
+/* Sun (::before) on the horizon, grid floor (::after). Both whole. */
+.storefront-theme main > div.min-h-screen:is(:has(> section .border-8):not(:has(> .storefront-hero)), :has(> section .lg\:grid-cols-5), :has(> section svg.lucide-book-open), :has(> section [data-slot="avatar"])) > section.bg-primary:first-child::before {
+  content: "";
+  position: absolute;
+  inset: auto auto calc(var(--tc-floor-h) - 2px) 50%;
+  z-index: -1;
+  width: var(--tc-sun-w);
+  height: auto;
+  aspect-ratio: 1;
+  translate: -50% 0;
+  background: url("/brand/sun.svg") center / contain no-repeat;
+  filter: drop-shadow(0 0 40px rgb(255 46 154 / 0.5));
+  -webkit-mask: none;
+  mask: none;
+}
+
+.storefront-theme main > div.min-h-screen:is(:has(> section .border-8):not(:has(> .storefront-hero)), :has(> section .lg\:grid-cols-5), :has(> section svg.lucide-book-open), :has(> section [data-slot="avatar"])) > section.bg-primary:first-child::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  top: auto;
+  z-index: -1;
+  height: var(--tc-floor-h);
+  background: url("/brand/floor.svg") center top / 100% 100% no-repeat;
+  -webkit-mask: none;
+  mask: none;
+}
+
+@media (min-width: 1024px) {
+  .storefront-theme main > div.min-h-screen:is(:has(> section .border-8):not(:has(> .storefront-hero)), :has(> section .lg\:grid-cols-5), :has(> section svg.lucide-book-open), :has(> section [data-slot="avatar"])) > section.bg-primary:first-child {
+    --tc-sun-w: clamp(14rem, 19vw, 18rem);
+    padding-bottom: calc(var(--tc-floor-h) + 3rem) !important;
+  }
+
+  .storefront-theme main > div.min-h-screen:is(:has(> section .border-8):not(:has(> .storefront-hero)), :has(> section .lg\:grid-cols-5), :has(> section svg.lucide-book-open), :has(> section [data-slot="avatar"])) > section.bg-primary:first-child::before {
+    left: auto;
+    right: 5%;
+    translate: 0 0;
+  }
+
+  .storefront-theme main > div.min-h-screen:is(:has(> section .border-8):not(:has(> .storefront-hero)), :has(> section .lg\:grid-cols-5), :has(> section svg.lucide-book-open), :has(> section [data-slot="avatar"])) > section.bg-primary:first-child > div:not(.absolute) {
+    max-width: min(46rem, 100% - 2 * (var(--tc-sun-w) + 4%)) !important;
+  }
+}
+
+/* Contact: the sun rises behind the form instead (below). */
+.storefront-theme.storefront-theme main > div.min-h-screen:has(> section .lg\:grid-cols-5) > section.bg-primary:first-child::before {
+  content: none;
+}
+
+.storefront-theme.storefront-theme main > div.min-h-screen:has(> section .lg\:grid-cols-5) > section.bg-primary:first-child {
+  padding-bottom: calc(var(--tc-floor-h) + 2.5rem) !important;
+}
+
+.storefront-theme main > div.min-h-screen:is(:has(> section .border-8):not(:has(> .storefront-hero)), :has(> section .lg\:grid-cols-5), :has(> section svg.lucide-book-open), :has(> section [data-slot="avatar"])) > section.bg-primary:first-child [data-slot="badge"] {
+  rotate: -2.5deg;
+  padding: 0.3em 0.75em 0.35em;
+  border: 0 !important;
+  border-radius: 0.42em !important;
+  background: var(--tc-pink) !important;
+  color: var(--tc-ink) !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  font-family: var(--tc-font-text);
+  font-size: clamp(0.9rem, 1.4vw, 1.05rem) !important;
+  font-weight: 800;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+.storefront-theme main > div.min-h-screen:is(:has(> section .border-8):not(:has(> .storefront-hero)), :has(> section .lg\:grid-cols-5), :has(> section svg.lucide-book-open), :has(> section [data-slot="avatar"])) > section.bg-primary:first-child h1 {
+  font-size: clamp(3.3rem, 10vw, 8.25rem) !important;
+  line-height: 0.86 !important;
+  letter-spacing: 0.002em !important;
+  color: #fff !important;
+  text-transform: uppercase;
+}
+
+.storefront-theme main > div.min-h-screen:is(:has(> section .border-8):not(:has(> .storefront-hero)), :has(> section .lg\:grid-cols-5), :has(> section svg.lucide-book-open), :has(> section [data-slot="avatar"])) > section.bg-primary:first-child h1 > span {
+  color: var(--tc-pink) !important;
+  text-shadow: var(--tc-halo-pink);
+  background: none !important;
+  padding: 0 !important;
+}
+
+.storefront-theme main > div.min-h-screen:is(:has(> section .border-8):not(:has(> .storefront-hero)), :has(> section .lg\:grid-cols-5), :has(> section svg.lucide-book-open), :has(> section [data-slot="avatar"])) > section.bg-primary:first-child p {
+  color: var(--tc-text-2) !important;
+  font-size: clamp(1.1rem, 1.7vw, 1.3rem) !important;
+  font-weight: 500;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section [data-slot="avatar"]) > section.bg-primary:first-child [data-slot="avatar"] {
+  border: 0 !important;
+  box-shadow: 0 0 0 3px var(--tc-pink), 0 0 26px rgb(255 46 154 / 0.6) !important;
+}
+
+/* Reusable pieces of the engine pages: badges become captions, blur blobs go. */
+.storefront-theme main > div.min-h-screen:is(:has(> section .border-8):not(:has(> .storefront-hero)), :has(> section .lg\:grid-cols-5), :has(> section svg.lucide-book-open), :has(> section [data-slot="avatar"]), :has(> article)) > section:not(:first-child) [data-slot="badge"],
+.storefront-theme main > div.min-h-screen:has(> article) article > [data-slot="badge"] {
+  rotate: -2.5deg;
+  border: 0 !important;
+  border-radius: 0.42em !important;
+  background: var(--tc-cyan) !important;
+  color: var(--tc-ink) !important;
+  font-family: var(--tc-font-text);
+  font-size: 0.95rem !important;
+  font-weight: 800;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  padding: 0.25em 0.7em 0.3em !important;
+}
+
+.storefront-theme main > div.min-h-screen:is(:has(> section .border-8):not(:has(> .storefront-hero)), :has(> section .lg\:grid-cols-5), :has(> section svg.lucide-book-open)) div.absolute[class*="blur"] {
+  display: none;
+}
+
+.storefront-theme main > div.min-h-screen:is(:has(> section .border-8):not(:has(> .storefront-hero)), :has(> section .lg\:grid-cols-5), :has(> section svg.lucide-book-open)) > section:not(:first-child) h2 {
+  font-size: clamp(2.6rem, 6.5vw, 5.25rem) !important;
+  line-height: 0.9 !important;
+  letter-spacing: 0.005em !important;
+  text-transform: uppercase;
+}
+
+/* An LED-framed night plate (the engine's pink CTA blocks). */
+.storefront-theme main > div.min-h-screen:is(:has(> section .border-8):not(:has(> .storefront-hero)), :has(> section svg.lucide-book-open), :has(> section .lg\:grid-cols-5)) > section:not(:first-child) div.bg-primary {
+  --tc-text: #fff5fa;
+  --tc-text-2: #d9cdd5;
+  --primary-foreground: 330 100% 98%;
+  --foreground: 330 100% 98%;
+  position: relative;
+  isolation: isolate;
+  overflow: visible !important;
+  border: 3px solid transparent !important;
+  border-radius: var(--tc-r-slab) !important;
+  background:
+    radial-gradient(70% 90% at 50% 120%, rgb(255 46 154 / 0.22), transparent 70%) padding-box,
+    linear-gradient(var(--tc-night), var(--tc-night)) padding-box,
+    linear-gradient(100deg, #ff2e9a 0%, #aa94ff 30%, #5dd1e3 50%, #aa94ff 70%, #ff2e9a 100%) 0 0 / 200% 100% border-box !important;
+  color: var(--tc-text);
+  box-shadow: 0 0 18px rgb(255 46 154 / 0.45), 0 0 50px rgb(93 209 227 / 0.2) !important;
+}
+
+.storefront-theme main > div.min-h-screen:is(:has(> section .border-8):not(:has(> .storefront-hero)), :has(> section svg.lucide-book-open), :has(> section .lg\:grid-cols-5)) > section:not(:first-child) div.bg-primary :is(h2, h3, p) {
+  color: var(--tc-text) !important;
+}
+
+.storefront-theme main > div.min-h-screen:is(:has(> section .border-8):not(:has(> .storefront-hero)), :has(> section svg.lucide-book-open), :has(> section .lg\:grid-cols-5)) > section:not(:first-child) div.bg-primary :is(h2, h3) > span {
+  color: var(--tc-pink) !important;
+  text-shadow: var(--tc-halo-pink);
+  background: none !important;
+  padding: 0 !important;
+}
+
+.storefront-theme main > div.min-h-screen:is(:has(> section .border-8):not(:has(> .storefront-hero)), :has(> section svg.lucide-book-open), :has(> section .lg\:grid-cols-5)) > section:not(:first-child) div.bg-primary > .absolute {
+  display: none;
+}
+
+/* ── 9.2 /about: « la bande » ── */
+.storefront-theme main > div.min-h-screen:has(> section .border-8):not(:has(> .storefront-hero)) > section:nth-child(2) h2 > span {
+  color: var(--tc-word) !important;
+}
+
+.dark .storefront-theme main > div.min-h-screen:has(> section .border-8):not(:has(> .storefront-hero)) > section:nth-child(2) h2 > span {
+  color: var(--tc-pink) !important;
+}
+
+/* The story photo: a vertical TikTok frame, tilted. */
+.storefront-theme main > div.min-h-screen:has(> section .border-8):not(:has(> .storefront-hero)) div.border-8 {
+  width: min(100%, 23rem);
+  margin-inline: auto;
+  border: 0 !important;
+  border-radius: 2rem !important;
+  rotate: -4deg;
+  box-shadow:
+    0 0 0 3px #fff,
+    -16px 24px 50px -16px rgb(255 46 154 / 0.55),
+    18px 30px 60px -20px rgb(93 209 227 / 0.45) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section .border-8):not(:has(> .storefront-hero)) div.border-8 img {
+  aspect-ratio: 9 / 14 !important;
+  width: 100%;
+  max-height: 64svh;
+  object-fit: cover;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section .border-8):not(:has(> .storefront-hero)) div.border-8 > div.absolute {
+  background: linear-gradient(180deg, transparent 60%, rgb(11 8 12 / 0.75)) !important;
+}
+
+/* The TikTok progress bar at the foot of the frame. */
+.storefront-theme main > div.min-h-screen:has(> section .border-8):not(:has(> .storefront-hero)) div.border-8::after {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 1.1rem;
+  height: 4px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--tc-pink) 0 62%, rgb(255 255 255 / 0.45) 62%);
+  box-shadow: 0 0 10px rgb(255 46 154 / 0.7);
+}
+
+.storefront-theme main > div.min-h-screen:has(> section .border-8):not(:has(> .storefront-hero)) > section:nth-child(2) p + p {
+  margin-top: 0.9rem;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section .border-8):not(:has(> .storefront-hero)) > section:nth-child(2) :is(p) {
+  font-size: 1.15rem;
+  line-height: 1.65;
+  color: var(--tc-text-2);
+}
+
+/* Values: three 9:16 frames fanned out, each title a TikTok caption. */
+.storefront-theme main > div.min-h-screen:has(> section .border-8):not(:has(> .storefront-hero)) > section:nth-child(3) {
+  background: transparent !important;
+  overflow-x: clip;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section .border-8):not(:has(> .storefront-hero)) > section:nth-child(3) .grid {
+  view-timeline: --tc-fan block;
+  gap: 1.25rem;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section .border-8):not(:has(> .storefront-hero)) > section:nth-child(3) .grid > div {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start;
+  min-height: 0;
+  aspect-ratio: 4 / 5;
+  max-height: 62svh;
+  padding: 1.4rem !important;
+  overflow: hidden;
+  border: 0 !important;
+  border-radius: 1.75rem !important;
+  text-align: left !important;
+  background-color: var(--tc-night) !important;
+  background-size: cover !important;
+  background-position: center !important;
+  box-shadow: 0 0 0 3px #fff, 0 30px 50px -26px rgb(0 0 0 / 0.95) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section .border-8):not(:has(> .storefront-hero)) > section:nth-child(3) .grid > div:nth-child(1) {
+  background-image: linear-gradient(180deg, rgb(11 8 12 / 0) 30%, rgb(11 8 12 / 0.94) 74%), url("/photos/crousty-curry.webp") !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section .border-8):not(:has(> .storefront-hero)) > section:nth-child(3) .grid > div:nth-child(2) {
+  background-image: linear-gradient(180deg, rgb(11 8 12 / 0) 30%, rgb(11 8 12 / 0.94) 74%), url("/photos/about-2.webp") !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section .border-8):not(:has(> .storefront-hero)) > section:nth-child(3) .grid > div:nth-child(3) {
+  background-image: linear-gradient(180deg, rgb(11 8 12 / 0) 30%, rgb(11 8 12 / 0.94) 74%), url("/photos/tenders.webp") !important;
+}
+
+/* The icon becomes the little round avatar at the top of a TikTok frame. */
+.storefront-theme main > div.min-h-screen:has(> section .border-8):not(:has(> .storefront-hero)) > section:nth-child(3) .grid > div > div:first-child {
+  position: absolute;
+  top: 1.1rem;
+  left: 1.1rem;
+  width: 3rem !important;
+  height: 3rem !important;
+  margin: 0 !important;
+  border-radius: 50% !important;
+  background: var(--tc-pink) !important;
+  color: var(--tc-ink) !important;
+  box-shadow: 0 0 0 3px #fff;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section .border-8):not(:has(> .storefront-hero)) > section:nth-child(3) .grid > div > div:first-child svg {
+  width: 1.4rem;
+  height: 1.4rem;
+  color: var(--tc-ink) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section .border-8):not(:has(> .storefront-hero)) > section:nth-child(3) .grid > div h3 {
+  display: inline-block;
+  margin-bottom: 0.6rem !important;
+  padding: 0.18em 0.45em 0.22em;
+  border-radius: 0.42em;
+  background: var(--tc-pink);
+  color: var(--tc-ink) !important;
+  font-family: var(--tc-font-text);
+  font-size: clamp(1.2rem, 2vw, 1.45rem) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0 !important;
+  line-height: 1.25 !important;
+  text-transform: none;
+  rotate: -2.5deg;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section .border-8):not(:has(> .storefront-hero)) > section:nth-child(3) .grid > div p {
+  color: #fff5fa !important;
+  font-weight: 700 !important;
+  line-height: 1.45 !important;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.8);
+}
+
+@media (min-width: 1024px) {
+  .storefront-theme main > div.min-h-screen:has(> section .border-8):not(:has(> .storefront-hero)) > section:nth-child(3) .grid {
+    gap: clamp(1.25rem, 2.5vw, 2.5rem);
+    padding-block: 1.5rem 3rem;
+  }
+
+  .storefront-theme main > div.min-h-screen:has(> section .border-8):not(:has(> .storefront-hero)) > section:nth-child(3) .grid > div {
+    aspect-ratio: 9 / 15;
+    max-height: 70svh;
+  }
+
+  .storefront-theme main > div.min-h-screen:has(> section .border-8):not(:has(> .storefront-hero)) > section:nth-child(3) .grid > div:nth-child(1) {
+    rotate: -6deg;
+    translate: 0 1.5rem;
+    z-index: 1;
+  }
+
+  .storefront-theme main > div.min-h-screen:has(> section .border-8):not(:has(> .storefront-hero)) > section:nth-child(3) .grid > div:nth-child(2) {
+    z-index: 2;
+  }
+
+  .storefront-theme main > div.min-h-screen:has(> section .border-8):not(:has(> .storefront-hero)) > section:nth-child(3) .grid > div:nth-child(3) {
+    rotate: 6deg;
+    translate: 0 1.5rem;
+    z-index: 1;
+  }
+}
+
+@media (max-width: 1023px) {
+  .storefront-theme main > div.min-h-screen:has(> section .border-8):not(:has(> .storefront-hero)) > section:nth-child(3) .grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    max-width: 26rem;
+    margin-inline: auto;
+  }
+
+  .storefront-theme main > div.min-h-screen:has(> section .border-8):not(:has(> .storefront-hero)) > section:nth-child(3) .grid > div:nth-child(odd) {
+    rotate: -1.5deg;
+  }
+
+  .storefront-theme main > div.min-h-screen:has(> section .border-8):not(:has(> .storefront-hero)) > section:nth-child(3) .grid > div:nth-child(even) {
+    rotate: 1.5deg;
+  }
+}
+
+/* ── 9.3 /contact: « On t'écoute » ── */
+.storefront-theme main > div.min-h-screen:has(> section .lg\:grid-cols-5) > section:nth-child(2) {
+  view-timeline: --tc-listen block;
+  isolation: isolate;
+  margin-top: 0 !important;
+  padding-top: clamp(7rem, 16vw, 11rem) !important;
+}
+
+/* The sun that rises behind the form (whole disc; the slab passes in front). */
+.storefront-theme main > div.min-h-screen:has(> section .lg\:grid-cols-5) > section:nth-child(2)::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  top: clamp(1rem, 3vw, 2rem);
+  width: min(78vw, 34rem);
+  aspect-ratio: 1;
+  translate: -50% 0;
+  background: url("/brand/sun.svg") center / contain no-repeat;
+  filter: drop-shadow(0 0 50px rgb(255 46 154 / calc(0.5 * var(--tc-glow))));
+}
+
+@media (min-width: 1024px) {
+  .storefront-theme main > div.min-h-screen:has(> section .lg\:grid-cols-5) > section:nth-child(2)::before {
+    left: 30%;
+  }
+}
+
+.storefront-theme main > div.min-h-screen:has(> section .lg\:grid-cols-5) .bg-card {
+  border: 0 !important;
+  border-radius: var(--tc-r-slab) !important;
+  background-color: var(--tc-slab) !important;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 30px 50px -30px rgb(0 0 0 / 0.9) !important;
+}
+
+.storefront-theme:not(.dark *) main > div.min-h-screen:has(> section .lg\:grid-cols-5) .bg-card {
+  box-shadow: 0 26px 44px -26px rgb(14 58 66 / 0.75) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section .lg\:grid-cols-5) .lg\:col-span-3 > .bg-card {
+  background-image: var(--tc-neon-line) !important;
+  background-size: 100% 5px !important;
+  background-repeat: no-repeat !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section .lg\:grid-cols-5) .bg-card h2 {
+  font-size: clamp(2rem, 4vw, 2.75rem) !important;
+  line-height: 0.95 !important;
+  text-transform: uppercase;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section .lg\:grid-cols-5) .bg-card h3 {
+  font-family: var(--tc-font-display);
+  font-size: 1.35rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.05em !important;
+}
+
+/* Icon chips: pink for the form, cyan for the side cards. */
+.storefront-theme main > div.min-h-screen:has(> section .lg\:grid-cols-5) .bg-card .h-10.w-10 {
+  border-radius: 50% !important;
+  background: var(--tc-cyan) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section .lg\:grid-cols-5) .lg\:col-span-3 .h-10.w-10 {
+  background: var(--tc-pink) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section .lg\:grid-cols-5) .bg-card .h-10.w-10 svg {
+  color: var(--tc-ink) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section .lg\:grid-cols-5) form label {
+  font-family: var(--tc-font-display);
+  font-size: 1rem !important;
+  font-weight: 850 !important;
+  letter-spacing: 0.06em !important;
+  color: var(--tc-text) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section .lg\:grid-cols-5) form :is(input, select, textarea) {
+  background: var(--tc-slab-2) !important;
+  color: var(--tc-text) !important;
+  font-size: 1rem !important;
+  border-color: hsl(var(--input)) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section .lg\:grid-cols-5) form :is(input, select, textarea):focus-visible {
+  border-color: hsl(var(--ring)) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section .lg\:grid-cols-5) .lg\:col-span-2 :is(address, p, dt, dd, a span) {
+  font-size: 1.05rem !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section .lg\:grid-cols-5) .lg\:col-span-2 address {
+  font-family: var(--tc-font-display);
+  font-size: 1.6rem !important;
+  font-weight: 900;
+  line-height: 1.05 !important;
+  text-transform: uppercase;
+  color: var(--tc-text) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section .lg\:grid-cols-5) .lg\:col-span-2 dd {
+  font-family: var(--tc-font-display);
+  font-size: 1.3rem !important;
+  letter-spacing: 0.02em;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section .lg\:grid-cols-5) .lg\:col-span-2 a {
+  color: var(--tc-text) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section .lg\:grid-cols-5) .lg\:col-span-2 a:hover {
+  color: var(--tc-word) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section .lg\:grid-cols-5) .lg\:col-span-2 a svg {
+  color: var(--tc-word);
+}
+
+/* ── 9.4 /blog: « le mag » ── */
+.storefront-theme main > div.min-h-screen:has(> section svg.lucide-book-open) > section:nth-child(2):not(:has(svg.lucide-book-open)) {
+  margin-top: 0 !important;
+  padding-top: clamp(3rem, 6vw, 5rem) !important;
+}
+
+/* The featured cover lands in perspective (the link is the one plane). */
+.storefront-theme main > div.min-h-screen:has(> section svg.lucide-book-open) a.group.block:not(.h-full) {
+  transform: perspective(1400px) rotateX(var(--tc-tilt-x));
+  transform-origin: 50% 100%;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section svg.lucide-book-open) a.group .bg-card {
+  border: 0 !important;
+  border-radius: var(--tc-r-slab) !important;
+  background: var(--tc-slab) !important;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 30px 50px -30px rgb(0 0 0 / 0.95) !important;
+  transition: translate var(--tc-dur-2) var(--tc-ease-snap), box-shadow var(--tc-dur-2) ease !important;
+}
+
+.storefront-theme:not(.dark *) main > div.min-h-screen:has(> section svg.lucide-book-open) a.group .bg-card {
+  box-shadow: 0 26px 44px -26px rgb(14 58 66 / 0.75) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section svg.lucide-book-open) a.group:hover .bg-card {
+  translate: 0 -4px;
+  box-shadow: var(--tc-box-pink), 0 30px 50px -30px rgb(0 0 0 / 0.95) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section svg.lucide-book-open) a.group .absolute.top-6.left-6 {
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+@media (max-width: 1023px) {
+  .storefront-theme main > div.min-h-screen:has(> section svg.lucide-book-open) a.group .relative:has(> img) {
+    max-height: 48svh;
+  }
+}
+
+.storefront-theme main > div.min-h-screen:has(> section svg.lucide-book-open) a.group .absolute.top-6.left-6 [data-slot="badge"],
+.storefront-theme main > div.min-h-screen:has(> section svg.lucide-book-open) a.group .absolute.top-4.left-4 [data-slot="badge"] {
+  background: var(--tc-pink) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section svg.lucide-book-open) a.group .absolute.top-4.right-4 {
+  border: 0 !important;
+  border-radius: var(--tc-r-pill) !important;
+  background: var(--tc-ink) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section svg.lucide-book-open) a.group .absolute.top-4.right-4 p {
+  color: #fff5fa !important;
+  font-size: 0.8rem !important;
+}
+
+/* Titles of the articles: TikTok captions. */
+.storefront-theme main > div.min-h-screen:has(> section svg.lucide-book-open) a.group :is(h2, h3) {
+  width: fit-content;
+  padding: 0.14em 0.42em 0.2em;
+  border-radius: 0.42em;
+  background: var(--tc-pink);
+  color: var(--tc-ink) !important;
+  font-family: var(--tc-font-text);
+  font-weight: 800 !important;
+  letter-spacing: -0.01em !important;
+  line-height: 1.22 !important;
+  rotate: -1.5deg;
+  transition: background-color var(--tc-dur-1) ease, rotate var(--tc-dur-2) var(--tc-ease-snap);
+}
+
+.storefront-theme main > div.min-h-screen:has(> section svg.lucide-book-open) a.group h2 {
+  font-size: clamp(1.45rem, 2.3vw, 1.95rem) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section svg.lucide-book-open) a.group h3 {
+  font-size: 1.35rem !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section svg.lucide-book-open) a.group:hover :is(h2, h3) {
+  background: var(--tc-cyan);
+  rotate: 0deg;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section svg.lucide-book-open) a.group p {
+  color: var(--tc-text-2) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section svg.lucide-book-open) a.group :is(span, div).text-accent-foreground,
+.storefront-theme main > div.min-h-screen:has(> section svg.lucide-book-open) a.group .border-t {
+  color: var(--tc-word) !important;
+  font-size: 0.8rem !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section svg.lucide-book-open) a.group .border-t {
+  border-color: var(--tc-line) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section svg.lucide-book-open) section div.mb-12 h2 {
+  font-size: clamp(2.2rem, 5vw, 3.5rem) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section svg.lucide-book-open) section div.mb-12 .h-10.w-10 {
+  border-radius: 50% !important;
+  background: var(--tc-pink) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section svg.lucide-book-open) section div.mb-12 .h-10.w-10 svg {
+  color: var(--tc-ink) !important;
+}
+
+/* The newsletter block: the LED plate (§9.1); its field becomes white. */
+.storefront-theme main > div.min-h-screen:has(> section svg.lucide-book-open) div.bg-primary form input {
+  height: 3.25rem;
+  border: 2px solid #8e7f8a !important;
+  border-radius: var(--tc-r-pill) !important;
+  background: var(--tc-night-2) !important;
+  color: #fff5fa !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section svg.lucide-book-open) div.bg-primary form input::placeholder {
+  color: #b9aeb5 !important;
+}
+
+/* ── 9.5 An article ── */
+.storefront-theme main > div.min-h-screen:has(> article) {
+  background: transparent !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> article) > article {
+  max-width: 50rem;
+  padding-top: calc(var(--tc-bar-h) + var(--tc-bar-top) + clamp(2rem, 5vw, 3.5rem)) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> article) article > a[href="/blog"] {
+  padding: 0.55rem 1rem;
+  border-radius: var(--tc-r-pill);
+  background: color-mix(in srgb, var(--tc-text) 10%, transparent);
+  color: var(--tc-text) !important;
+  font-size: 0.8rem !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> article) article > a[href="/blog"]:hover {
+  background: var(--tc-pink);
+  color: var(--tc-ink) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> article) article > h1 {
+  font-size: clamp(2.9rem, 7.5vw, 5.75rem) !important;
+  line-height: 0.9 !important;
+  letter-spacing: 0.003em !important;
+  text-transform: uppercase;
+}
+
+/* A neon tube under the title. */
+.storefront-theme main > div.min-h-screen:has(> article) article > h1::after {
+  content: "";
+  display: block;
+  width: min(14rem, 50%);
+  height: 4px;
+  margin-top: 1.25rem;
+  border-radius: 4px;
+  background: var(--tc-neon-line);
+  box-shadow: 0 0 12px rgb(255 46 154 / calc(0.7 * var(--tc-glow)));
+}
+
+.storefront-theme main > div.min-h-screen:has(> article) article > p.text-lg {
+  font-size: clamp(1.2rem, 2vw, 1.45rem) !important;
+  font-weight: 600 !important;
+  color: var(--tc-text) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> article) article > div.relative {
+  max-height: 60svh;
+  border: 0 !important;
+  border-radius: 1.75rem !important;
+  transform: perspective(1300px) rotateX(var(--tc-tilt-x));
+  transform-origin: 50% 0%;
+  box-shadow:
+    0 0 0 3px #fff,
+    -18px 26px 50px -20px rgb(255 46 154 / 0.55),
+    18px 30px 60px -24px rgb(93 209 227 / 0.45);
+}
+
+.storefront-theme main > div.min-h-screen:has(> article) article .prose {
+  padding: clamp(1.4rem, 4vw, 2.75rem);
+  border-radius: var(--tc-r-slab);
+  background: var(--tc-slab);
+  color: var(--tc-text) !important;
+  font-size: 1.15rem;
+  line-height: 1.75;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06);
+}
+
+.storefront-theme:not(.dark *) main > div.min-h-screen:has(> article) article .prose {
+  box-shadow: 0 26px 44px -26px rgb(14 58 66 / 0.75);
+}
+
+.storefront-theme main > div.min-h-screen:has(> article) article .prose p {
+  color: var(--tc-text);
+}
+
+.storefront-theme main > div.min-h-screen:has(> article) article .prose > p:first-child::first-letter {
+  float: left;
+  margin: 0.06em 0.12em 0 0;
+  font-family: var(--tc-font-display);
+  font-size: 4.4em;
+  font-style: italic;
+  font-weight: 950;
+  line-height: 0.78;
+  color: var(--tc-word);
+}
+
+.dark .storefront-theme main > div.min-h-screen:has(> article) article .prose > p:first-child::first-letter {
+  color: var(--tc-pink);
+  text-shadow: var(--tc-halo-pink);
+}
+
+.storefront-theme main > div.min-h-screen:has(> article) article .prose a {
+  color: var(--tc-word);
+  text-decoration-thickness: 2px;
+}
+
+.storefront-theme main > div.min-h-screen:has(> article) article [data-slot="badge"]:not(:first-of-type) {
+  border-radius: var(--tc-r-pill) !important;
+}
+
+/* ── 9.6 Legal pages: big title, a ribbon, slabs ── */
+.storefront-theme main:has(> main) {
+  overflow-x: clip;
+}
+
+.storefront-theme main > main {
+  position: relative;
+  max-width: 54rem !important;
+  padding-top: calc(var(--tc-bar-h) + var(--tc-bar-top) + 6.5rem) !important;
+}
+
+/* The pink band of the small print, decor only (hidden from assistive tech). */
+.storefront-theme main > main::before {
+  content: "LES PETITES LIGNES  ·  LUES ET APPROUVÉES  ·  LES PETITES LIGNES  ·  LUES ET APPROUVÉES  ·  LES PETITES LIGNES  ·  LUES ET APPROUVÉES  ·  LES PETITES LIGNES" / "";
+  position: absolute;
+  top: calc(var(--tc-bar-h) + var(--tc-bar-top) + 1.4rem);
+  left: 50%;
+  width: 100vw;
+  translate: -50% 0;
+  rotate: -3deg;
+  padding-block: 0.5rem;
+  overflow: hidden;
+  white-space: nowrap;
+  background: var(--tc-pink-deep);
+  color: #fff;
+  font-family: var(--tc-font-display);
+  font-size: clamp(1.2rem, 2.6vw, 1.75rem);
+  font-style: italic;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  box-shadow: 0 0 0 2px var(--tc-ink), 0 12px 30px -10px rgb(0 0 0 / 0.6);
+}
+
+.storefront-theme main > main > h1 {
+  font-size: clamp(2.9rem, 8vw, 5.5rem) !important;
+  line-height: 0.9 !important;
+  letter-spacing: 0.003em !important;
+  text-transform: uppercase;
+  color: var(--tc-text) !important;
+}
+
+.storefront-theme main > main > h1::after {
+  content: "";
+  display: block;
+  width: min(12rem, 40%);
+  height: 4px;
+  margin-top: 1.1rem;
+  border-radius: 4px;
+  background: var(--tc-neon-line);
+  box-shadow: 0 0 12px rgb(255 46 154 / calc(0.7 * var(--tc-glow)));
+}
+
+.storefront-theme main > main > div.mt-4 {
+  font-size: 1.05rem !important;
+  color: var(--tc-text-2) !important;
+}
+
+.storefront-theme main > main > div.mt-10 {
+  display: grid;
+  gap: 1rem;
+}
+
+.storefront-theme main > main > div.mt-10 > * {
+  margin-top: 0 !important;
+}
+
+.storefront-theme main > main section {
+  padding: clamp(1.2rem, 3vw, 1.9rem);
+  border-radius: var(--tc-r-card);
+  background: var(--tc-slab);
+  box-shadow: inset 4px 0 0 var(--tc-pink), inset 0 1px 0 rgb(255 255 255 / 0.05);
+}
+
+.storefront-theme:not(.dark *) main > main section {
+  box-shadow: inset 4px 0 0 var(--tc-pink-deep), 0 16px 30px -22px rgb(14 58 66 / 0.75);
+}
+
+.storefront-theme main > main section h2 {
+  font-size: clamp(1.6rem, 3vw, 2.1rem) !important;
+  line-height: 0.95 !important;
+  text-transform: uppercase;
+}
+
+.storefront-theme main > main section > div {
+  font-size: 1rem !important;
+  line-height: 1.7 !important;
+  color: var(--tc-text) !important;
+}
+
+.storefront-theme main > main :is(section, div) a {
+  color: var(--tc-word);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+.storefront-theme main > main [data-legal-missing] {
+  display: inline-block;
+  padding: 0 0.55em;
+  border: 1.5px dashed currentColor;
+  border-radius: var(--tc-r-pill);
+  color: var(--tc-cyan) !important;
+  font-style: normal !important;
+  font-weight: 700;
+}
+
+.storefront-theme:not(.dark *) main > main [data-legal-missing] {
+  color: var(--tc-ink) !important;
+}
+
+/* ── 9.7 Auth screens: one slab on the night (or on the turquoise wall) ── */
+.storefront-theme:not(:has(> header)) > div.min-h-screen {
+  isolation: isolate;
+  padding-block: 6rem 4rem;
+}
+
+.dark .storefront-theme:not(:has(> header)) > div.min-h-screen {
+  background:
+    url("/brand/floor.svg") center bottom / 100% min(24svh, 210px) no-repeat,
+    radial-gradient(70% 50% at 50% 100%, rgb(255 46 154 / 0.25), transparent 70%),
+    linear-gradient(180deg, var(--tc-night) 0%, #1d0f24 55%, #3a1240 100%) !important;
+}
+
+.storefront-theme:not(:has(> header)) > div.min-h-screen > div.absolute.pointer-events-none {
+  display: none;
+}
+
+/* The sun behind the slab (the slab passes in front, the disc stays whole). */
+.storefront-theme:not(:has(> header)) > div.min-h-screen::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  top: calc(50% + 8rem);
+  width: min(90vw, 40rem);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  background: url("/brand/sun.svg") center / contain no-repeat;
+  filter: drop-shadow(0 0 60px rgb(255 46 154 / calc(0.45 * var(--tc-glow))));
+}
+
+.storefront-theme:not(:has(> header)) > div.min-h-screen > a.absolute {
+  padding: 0.55rem 1rem;
+  border-radius: var(--tc-r-pill);
+  background: #fff;
+  color: var(--tc-pink-deep) !important;
+  font-family: var(--tc-font-display);
+  font-size: 0.95rem !important;
+  box-shadow: 0 0 0 2px var(--tc-ink);
+}
+
+.storefront-theme:not(:has(> header)) > div.min-h-screen h1 {
+  font-size: clamp(3.2rem, 10vw, 5.5rem) !important;
+  line-height: 0.88 !important;
+  letter-spacing: 0.003em !important;
+  text-transform: uppercase;
+}
+
+.dark .storefront-theme:not(:has(> header)) > div.min-h-screen h1 {
+  color: #fff;
+}
+
+.storefront-theme:not(:has(> header)) > div.min-h-screen .bg-card {
+  border: 0 !important;
+  border-radius: var(--tc-r-slab) !important;
+  background-color: var(--tc-slab) !important;
+  background-image: var(--tc-neon-line);
+  background-size: 100% 5px;
+  background-repeat: no-repeat;
+  box-shadow: 0 40px 70px -30px rgb(0 0 0 / 0.95), 0 0 0 1px rgb(255 255 255 / 0.06) !important;
+}
+
+.storefront-theme:not(.dark *):not(:has(> header)) > div.min-h-screen .bg-card {
+  box-shadow: 0 30px 50px -26px rgb(14 58 66 / 0.8) !important;
+}
+
+.storefront-theme:not(:has(> header)) > div.min-h-screen form label {
+  font-family: var(--tc-font-display);
+  font-size: 1rem !important;
+  font-weight: 850 !important;
+  letter-spacing: 0.06em !important;
+}
+
+.storefront-theme:not(:has(> header)) > div.min-h-screen form input {
+  background: var(--tc-slab-2) !important;
+  font-size: 1rem !important;
+  border-color: hsl(var(--input)) !important;
+}
+
+.storefront-theme:not(:has(> header)) > div.min-h-screen > div > p.text-center {
+  display: block;
+  width: fit-content;
+  margin-inline: auto;
+  padding: 0.6rem 1.1rem;
+  border-radius: var(--tc-r-pill);
+  background: var(--tc-slab);
+  color: var(--tc-text) !important;
+}
+
+/* ── 9.8 /account below its head ── */
+.storefront-theme main > div.min-h-screen:has(> section [data-slot="avatar"]) > div .group.rounded-2xl.bg-card {
+  border: 0 !important;
+  border-radius: var(--tc-r-card) !important;
+  transition: translate var(--tc-dur-2) var(--tc-ease-snap), box-shadow var(--tc-dur-2) ease !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section [data-slot="avatar"]) > div .group.rounded-2xl.bg-card:hover {
+  translate: 0 -3px;
+  box-shadow: var(--tc-box-pink) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section [data-slot="avatar"]) > div > div.rounded-3xl.bg-card {
+  border: 0 !important;
+  border-radius: var(--tc-r-slab) !important;
+  background-image: var(--tc-neon-line);
+  background-size: 100% 4px;
+  background-repeat: no-repeat;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section [data-slot="avatar"]) [role="tablist"] {
+  border-radius: var(--tc-r-pill) !important;
+  background: var(--tc-slab-2) !important;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section [data-slot="avatar"]) [role="tab"] {
+  border-radius: var(--tc-r-pill) !important;
+  font-family: var(--tc-font-display);
+  font-size: 1rem !important;
+  letter-spacing: 0.05em;
+}
+
+.storefront-theme main > div.min-h-screen:has(> section [data-slot="avatar"]) [role="tab"][data-state="active"] {
+  background: var(--tc-pink) !important;
+  color: var(--tc-ink) !important;
+}
+
+/* ── 9.9 The 404: a « 404 » in neon tubes, palms, the grid floor ── */
+.storefront-theme [data-testid="storefront-not-found"] {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  min-height: min(92svh, 860px) !important;
+  padding-top: calc(var(--tc-bar-h) + var(--tc-bar-top) + 2rem) !important;
+  padding-bottom: min(20svh, 170px) !important;
+  background:
+    url("/brand/palm.svg") left max(1rem, 4vw) bottom min(14svh, 120px) / clamp(5rem, 13vw, 10rem) auto no-repeat,
+    url("/brand/palm.svg") right max(1rem, 4vw) bottom min(14svh, 120px) / clamp(4rem, 10vw, 8rem) auto no-repeat;
+}
+
+.dark .storefront-theme [data-testid="storefront-not-found"] {
+  background:
+    url("/brand/palm.svg") left max(1rem, 4vw) bottom min(14svh, 120px) / clamp(5rem, 13vw, 10rem) auto no-repeat,
+    url("/brand/palm.svg") right max(1rem, 4vw) bottom min(14svh, 120px) / clamp(4rem, 10vw, 8rem) auto no-repeat,
+    url("/brand/floor.svg") center bottom / 100% min(20svh, 170px) no-repeat,
+    radial-gradient(circle at max(4.5rem, 10vw) 72%, rgb(245 120 176 / 0.55), transparent min(22vw, 13rem)),
+    radial-gradient(circle at calc(100% - max(3.5rem, 8.5vw)) 76%, rgb(93 209 227 / 0.4), transparent min(18vw, 11rem)),
+    radial-gradient(60% 50% at 50% 80%, rgb(255 46 154 / 0.3), transparent 70%);
+}
+
+/* In the night the palms are silhouettes against the pink glow. */
+.dark .storefront-theme [data-testid="storefront-not-found"]::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 min(14svh, 120px) 0;
+  z-index: -1;
+  height: 40%;
+  background: radial-gradient(50% 70% at 50% 100%, rgb(245 120 176 / 0.35), transparent 70%);
+}
+
+.storefront-theme [data-testid="storefront-not-found"]::before {
+  content: "404" / "";
+  display: block;
+  font-family: var(--tc-font-display);
+  font-size: clamp(9rem, 34vw, 19rem);
+  font-style: italic;
+  font-weight: 950;
+  line-height: 0.8;
+  letter-spacing: 0.02em;
+  color: transparent;
+  -webkit-text-stroke: clamp(3px, 0.6vw, 6px) var(--tc-pink-soft);
+  text-shadow:
+    0 0 6px rgb(255 46 154 / 0.9),
+    0 0 22px rgb(255 46 154 / 0.7),
+    0 0 60px rgb(245 120 176 / 0.45);
+}
+
+.storefront-theme:not(.dark *) [data-testid="storefront-not-found"]::before {
+  color: var(--tc-pink);
+  -webkit-text-stroke-color: var(--tc-ink);
+  text-shadow: 0 0 30px rgb(255 46 154 / 0.35);
+}
+
+.storefront-theme [data-testid="storefront-not-found"] h1 {
+  font-size: clamp(2.4rem, 6.5vw, 4.25rem) !important;
+  line-height: 0.92 !important;
+  letter-spacing: 0.003em !important;
+  text-transform: uppercase;
+  color: var(--tc-text) !important;
+}
+
+.storefront-theme [data-testid="storefront-not-found"] p {
+  max-width: 30rem !important;
+  font-size: 1.1rem !important;
+  color: var(--tc-text-2) !important;
+}
+
+.storefront-theme [data-testid="storefront-not-found"] > div > a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 3.1rem;
+  padding: 0 1.5rem !important;
+  border: 0 !important;
+  border-radius: var(--tc-r-pill) !important;
+  font-family: var(--tc-font-display);
+  font-size: 1.15rem !important;
+  font-weight: 850 !important;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: translate var(--tc-dur-2) var(--tc-ease-snap), box-shadow var(--tc-dur-2) ease !important;
+}
+
+.storefront-theme [data-testid="storefront-not-found"] > div > a:first-child {
+  background: var(--tc-pink) !important;
+  color: var(--tc-ink) !important;
+  box-shadow: 0 0 0 2px var(--tc-ink);
+}
+
+.storefront-theme [data-testid="storefront-not-found"] > div > a:last-child:not(:first-child) {
+  background: #fff !important;
+  color: var(--tc-pink-deep) !important;
+  box-shadow: 0 0 0 2px var(--tc-ink);
+}
+
+.storefront-theme [data-testid="storefront-not-found"] > div > a:hover {
+  translate: 0 -2px;
+  box-shadow: 0 0 0 2px var(--tc-ink), var(--tc-box-pink);
+}
+
+/* ═══════════════════════════ 10. MOTION ═══════════════════════════ */
+/* Load-time switch-ons (finite), then scroll scenes. Nothing here runs under
+   prefers-reduced-motion (base.css stops all animations there too). */
+
+@media (prefers-reduced-motion: no-preference) {
+  /* The sun rises once from behind the horizon (the floor hides its foot). */
+  .storefront-theme .tc-hero__sun {
+    animation: tc-sun-rise 1.8s var(--tc-ease-out) 0.15s both;
+  }
+
+  .storefront-theme .tc-hero__title > span,
+  .storefront-theme main > div.min-h-screen:is(:has(> section .border-8):not(:has(> .storefront-hero)), :has(> section .lg\:grid-cols-5), :has(> section svg.lucide-book-open), :has(> section [data-slot="avatar"])) > section.bg-primary:first-child h1 > span {
+    animation: tc-flicker-on var(--tc-dur-4) linear 0.5s both;
+  }
+
+  .storefront-theme [data-testid="storefront-not-found"]::before {
+    animation: tc-404-on 1.4s linear 0.3s both;
+  }
+
+  .storefront-theme .tc-hero__kicker .tc-caption {
+    animation: tc-pop 0.7s var(--tc-ease-snap) 0.25s both;
+  }
+
+  /* The city switches on letter by letter. */
+  .storefront-theme .tc-letters__l {
+    animation: tc-letter-on 0.9s linear both;
+    animation-delay: calc(0.5s + var(--i) * 0.11s);
+  }
+
+  /* Balloons rise once, then sway three times. */
+  .storefront-theme .tc-balloon {
+    animation:
+      tc-balloon-rise 1.9s var(--tc-ease-out) both,
+      tc-balloon-sway 2.6s ease-in-out 1.9s 3 alternate;
+  }
+
+  .storefront-theme .tc-balloon--blue { animation-delay: 0.15s, 2.05s; }
+  .storefront-theme .tc-balloon--white { animation-delay: 0.3s, 2.2s; }
+  .storefront-theme .tc-balloon--violet { animation-delay: 0.45s, 2.35s; }
+
+  /* The QR beam sweeps three times and rests in the middle. */
+  .storefront-theme .tc-qrgame__beam {
+    animation: tc-beam 1.6s ease-in-out 0.4s 3 both;
+  }
+
+  /* The flip button turns its arrow on hover. */
+  .storefront-theme .tc-club__flip:hover .tc-club__flip-icon {
+    rotate: 200deg;
+    transition: rotate 0.5s var(--tc-ease-snap);
+  }
+}
+
+@keyframes tc-404-on {
+  0% { opacity: 0.15; }
+  10% { opacity: 1; }
+  16% { opacity: 0.3; }
+  28% { opacity: 1; }
+  34% { opacity: 0.55; }
+  48% { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+@keyframes tc-sun-rise {
+  from { transform: translateY(70%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes tc-letter-on {
+  0% { opacity: 0.18; text-shadow: none; color: #5a4652; }
+  10% { opacity: 1; }
+  16% { opacity: 0.3; text-shadow: none; }
+  30% { opacity: 1; text-shadow: var(--tc-halo-pink); color: #ffd1ea; }
+  100% { opacity: 1; text-shadow: var(--tc-halo-pink); color: #ffd1ea; }
+}
+
+@keyframes tc-balloon-rise {
+  from { translate: 0 120%; opacity: 0; }
+  20% { opacity: 1; }
+  to { translate: 0 0; opacity: 1; }
+}
+
+@keyframes tc-balloon-sway {
+  from { rotate: -4deg; }
+  to { rotate: 4deg; }
+}
+
+@keyframes tc-beam {
+  0% { top: 12%; }
+  50% { top: 86%; }
+  100% { top: 50%; }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* /restaurant: the shopfront straightens as it scrolls in. */
+    .storefront-theme .tc-facade__plane {
+      animation: tc-front-turn linear both;
+      animation-timeline: --tc-front;
+      animation-range: entry 0% cover 45%;
+    }
+
+    /* Hours: each tube switches on as it enters. */
+    .storefront-theme .tc-hours__row {
+      animation: tc-tube-on linear both;
+      animation-timeline: view();
+      animation-range: entry 20% entry 100%;
+    }
+
+    /* /commander: the LED board's capitals slide with the scroll. */
+    .storefront-theme .tc-ledboard__run {
+      animation: tc-led-run linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0px 900px;
+    }
+
+    .storefront-theme .tc-board::before,
+    .storefront-theme .tc-shop__led {
+      animation: tc-led-sweep linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 60%;
+    }
+
+    .storefront-theme :is(.tc-go, .tc-apply__aside),
+    .storefront-theme main > div.min-h-screen:is(:has(> section .border-8):not(:has(> .storefront-hero)), :has(> section svg.lucide-book-open), :has(> section .lg\:grid-cols-5)) > section:not(:first-child) div.bg-primary {
+      animation: tc-frame-sweep linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 55%;
+    }
+
+    /* The bag turns and fills (pinned range from 900 px). */
+    .storefront-theme .tc-bag__body {
+      animation: tc-bag-turn linear both;
+      animation-timeline: --tc-bag;
+      animation-range: cover 0% contain 90%;
+    }
+
+    .storefront-theme .tc-bag__item {
+      animation: tc-drop linear both;
+      animation-timeline: --tc-bag;
+    }
+
+    .storefront-theme .tc-bag__item--1 { animation-range: contain 4% contain 24%; }
+    .storefront-theme .tc-bag__item--2 { animation-range: contain 30% contain 50%; }
+    .storefront-theme .tc-bag__item--3 { animation-range: contain 56% contain 76%; }
+
+    /* Club: the three digits and the receipt land. */
+    .storefront-theme .tc-how__item,
+    .storefront-theme .tc-bento__card,
+    .storefront-theme .tc-ticks li,
+    .storefront-theme .tc-faq details,
+    .storefront-theme .tc-step,
+    .storefront-theme .tc-build__step,
+    .storefront-theme main > main section {
+      animation: tc-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+
+    .storefront-theme .tc-receipt {
+      animation: tc-receipt-print linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 45%;
+    }
+
+    .storefront-theme .tc-qrgame__scan {
+      animation: tc-rise-tilt linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+
+    /* /franchise: the shopfront builds itself, layer by layer. */
+    .storefront-theme .tc-shop__wall {
+      animation: tc-layer-up linear both;
+      animation-timeline: --tc-build;
+      animation-range: contain 0% contain 16%;
+    }
+
+    .storefront-theme .tc-shop__awning {
+      animation: tc-layer-slide linear both;
+      animation-timeline: --tc-build;
+      animation-range: contain 22% contain 38%;
+    }
+
+    .storefront-theme .tc-shop__sign {
+      animation: tc-layer-drop linear both;
+      animation-timeline: --tc-build;
+      animation-range: contain 44% contain 60%;
+    }
+
+    .storefront-theme :is(.tc-shop__tasty, .tc-shop__disc) {
+      animation: tc-sign-on linear both;
+      animation-timeline: --tc-build;
+      animation-range: contain 64% contain 80%;
+    }
+
+    .storefront-theme .tc-shop__open {
+      animation: tc-pop linear both;
+      animation-timeline: --tc-build;
+      animation-range: contain 70% contain 84%;
+    }
+
+    /* /about: the three frames fan out as they come up. */
+    .storefront-theme main > div.min-h-screen:has(> section .border-8):not(:has(> .storefront-hero)) div.border-8 {
+      animation: tc-frame-straighten linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 40%;
+    }
+
+    /* /contact: the sun rises behind the form. */
+    .storefront-theme main > div.min-h-screen:has(> section .lg\:grid-cols-5) > section:nth-child(2)::before {
+      animation: tc-sun-rise linear both;
+      animation-timeline: --tc-listen;
+      animation-range: entry 0% cover 40%;
+    }
+
+    /* /blog and an article: the cover lands in perspective. */
+    .storefront-theme main > div.min-h-screen:has(> section svg.lucide-book-open) a.group.block:not(.h-full),
+    .storefront-theme main > div.min-h-screen:has(> article) article > div.relative {
+      animation: tc-land linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 40%;
+    }
+
+    .storefront-theme main > div.min-h-screen:has(> section svg.lucide-book-open) a.group.h-full .bg-card {
+      animation: tc-rise-tilt linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) and (min-width: 1024px) {
+    .storefront-theme main > div.min-h-screen:has(> section .border-8):not(:has(> .storefront-hero)) > section:nth-child(3) .grid > div:nth-child(1) {
+      animation: tc-fan-left linear both;
+      animation-timeline: --tc-fan;
+      animation-range: entry 10% cover 50%;
+    }
+
+    .storefront-theme main > div.min-h-screen:has(> section .border-8):not(:has(> .storefront-hero)) > section:nth-child(3) .grid > div:nth-child(3) {
+      animation: tc-fan-right linear both;
+      animation-timeline: --tc-fan;
+      animation-range: entry 10% cover 50%;
+    }
+  }
+
+  /* Below 900 px nothing pins: the scenes play as their section crosses the screen. */
+  @media (prefers-reduced-motion: no-preference) and (max-width: 899px) {
+    .storefront-theme .tc-bag__body { animation-range: entry 0% cover 55%; }
+    .storefront-theme .tc-bag__item { animation-name: tc-drop-short; }
+    .storefront-theme .tc-bag__item--1 { animation-range: cover 25% cover 40%; }
+    .storefront-theme .tc-bag__item--2 { animation-range: cover 33% cover 48%; }
+    .storefront-theme .tc-bag__item--3 { animation-range: cover 41% cover 56%; }
+    .storefront-theme .tc-shop__wall { animation-range: cover 30% cover 40%; }
+    .storefront-theme .tc-shop__awning { animation-range: cover 36% cover 46%; }
+    .storefront-theme .tc-shop__sign { animation-range: cover 42% cover 52%; }
+    .storefront-theme :is(.tc-shop__tasty, .tc-shop__disc) { animation-range: cover 50% cover 58%; }
+    .storefront-theme .tc-shop__open { animation-range: cover 54% cover 62%; }
+  }
+
+  /* Pinned steps light one after the other (900 px and up). */
+  @media (prefers-reduced-motion: no-preference) and (min-width: 900px) {
+    .storefront-theme .tc-step,
+    .storefront-theme .tc-build__step {
+      animation: tc-step-on linear both;
+    }
+
+    .storefront-theme .tc-step {
+      animation-timeline: --tc-bag;
+    }
+
+    .storefront-theme .tc-build__step {
+      animation-timeline: --tc-build;
+    }
+
+    .storefront-theme .tc-step--1 { animation-range: contain 0% contain 10%; }
+    .storefront-theme .tc-step--2 { animation-range: contain 28% contain 38%; }
+    .storefront-theme .tc-step--3 { animation-range: contain 54% contain 64%; }
+
+    .storefront-theme .tc-build__step--1 { animation-range: contain 0% contain 8%; }
+    .storefront-theme .tc-build__step--2 { animation-range: contain 22% contain 30%; }
+    .storefront-theme .tc-build__step--3 { animation-range: contain 44% contain 52%; }
+    .storefront-theme .tc-build__step--4 { animation-range: contain 66% contain 74%; }
+  }
+}
+
+@keyframes tc-front-turn {
+  from { --tc-ry: -26deg; scale: 0.92; }
+  to { --tc-ry: -7deg; scale: 1; }
+}
+
+@keyframes tc-tube-on {
+  0% { opacity: 0.3; }
+  25% { opacity: 1; }
+  35% { opacity: 0.45; }
+  50% { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+@keyframes tc-led-run {
+  from { translate: 0 0; }
+  to { translate: -38% 0; }
+}
+
+@keyframes tc-frame-sweep {
+  from { background-position: 0 0, 0 0, 100% 0; }
+  to { background-position: 0 0, 0 0, 0% 0; }
+}
+
+@keyframes tc-bag-turn {
+  from { --tc-bag-ry: -32deg; }
+  to { --tc-bag-ry: -6deg; }
+}
+
+@keyframes tc-drop {
+  from { translate: 0 -150%; opacity: 0; }
+  30% { opacity: 1; }
+  80% { translate: 0 6%; }
+  to { translate: 0 0; opacity: 1; }
+}
+
+@keyframes tc-drop-short {
+  from { translate: 0 -40%; opacity: 0; }
+  to { translate: 0 0; opacity: 1; }
+}
+
+@keyframes tc-step-on {
+  from { opacity: 0.4; translate: -0.75rem 0; box-shadow: none; }
+  to { opacity: 1; translate: 0 0; }
+}
+
+@keyframes tc-receipt-print {
+  from { clip-path: inset(0 0 100% 0); translate: 0 -1.5rem; }
+  to { clip-path: inset(0 0 0 0); translate: 0 0; }
+}
+
+@keyframes tc-layer-up {
+  from { translate: 0 30%; opacity: 0; }
+  to { translate: 0 0; opacity: 1; }
+}
+
+@keyframes tc-layer-slide {
+  from { translate: -60% 0; rotate: -8deg; opacity: 0; }
+  to { translate: 0 0; rotate: 0deg; opacity: 1; }
+}
+
+@keyframes tc-layer-drop {
+  from { translate: 0 -80%; rotate: 4deg; opacity: 0; }
+  70% { translate: 0 4%; rotate: -1deg; opacity: 1; }
+  to { translate: 0 0; rotate: 0deg; opacity: 1; }
+}
+
+@keyframes tc-sign-on {
+  0% { filter: brightness(0.25) saturate(0); }
+  30% { filter: brightness(1.2); }
+  40% { filter: brightness(0.4); }
+  60% { filter: brightness(1); }
+  100% { filter: brightness(1); }
+}
+
+@keyframes tc-frame-straighten {
+  from { rotate: -14deg; translate: -4% 3rem; }
+  to { rotate: -4deg; translate: 0 0; }
+}
+
+@keyframes tc-fan-left {
+  from { rotate: 0deg; translate: 104% 2.5rem; }
+  to { rotate: -6deg; translate: 0 1.5rem; }
+}
+
+@keyframes tc-fan-right {
+  from { rotate: 0deg; translate: -104% 2.5rem; }
+  to { rotate: 6deg; translate: 0 1.5rem; }
+}
+
+@keyframes tc-land {
+  from { --tc-tilt-x: 28deg; translate: 0 3rem; }
+  to { --tc-tilt-x: 0deg; translate: 0 0; }
+}
+
+/* ═══════════════════════════ 11. Reduced motion: the still compositions ═══════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  /* The member card: both faces flat, one under the other, no button. */
+  .storefront-theme .tc-club__card {
+    transform: none;
+    gap: 1rem;
+  }
+
+  .storefront-theme .tc-club__face {
+    grid-area: auto;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .storefront-theme .tc-club__flip {
+    display: none;
+  }
+
+  .storefront-theme .tc-ledboard {
+    transform: none;
+  }
+}
+
+/* Light mode: a cyan caption would vanish on the turquoise wall; it becomes an
+   ink tag (white on ink, 18.84:1). Inside night islands it stays cyan. */
+.storefront-theme:not(.dark *) .tc-caption--cyan:not(.tc-on-night *, .tc-hero *) {
+  background: var(--tc-ink);
+  color: var(--tc-white);
+}
+
+.storefront-theme:not(.dark *) main > div.min-h-screen:is(:has(> section .border-8):not(:has(> .storefront-hero)), :has(> section .lg\:grid-cols-5), :has(> section svg.lucide-book-open), :has(> section [data-slot="avatar"]), :has(> article)) > section:not(:first-child) > div [data-slot="badge"]:not(a [data-slot="badge"]),
+.storefront-theme:not(.dark *) main > div.min-h-screen:has(> article) article > [data-slot="badge"] {
+  background: var(--tc-ink) !important;
+  color: var(--tc-white) !important;
+}
